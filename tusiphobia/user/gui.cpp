@@ -278,7 +278,7 @@ ImGui::TreePop(); \
 			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNode("ghost")) {
+		if (false && ImGui::TreeNode("ghost")) {
 			if (SGhostAI::started) {
 				SGhostAI* ghostAI = SGhostAI::get();
 				if (ImGui::Button("appear"))
