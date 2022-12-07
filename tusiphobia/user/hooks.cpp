@@ -537,11 +537,14 @@ void PCPropGrab_Update_Hook(SPCPropGrab* __this, MethodInfo* method) {
 app::ServerSettings* (*PhotonNetwork_get_PhotonServerSettings)(MethodInfo* method);
 
 app::ServerSettings* PhotonNetwork_get_PhotonServerSettings_Hook(MethodInfo* method) {
-	app::ServerSettings* serverSettings = PhotonNetwork_get_PhotonServerSettings(method);
+	static app::ServerSettings* serverSettings;
+	if (!serverSettings) {
+		serverSettings = PhotonNetwork_get_PhotonServerSettings(method);
 
-	SString* appId = SString::of(TUSIPHOBIA_PHOTON_APPID);
-	serverSettings->fields.AppSettings->fields.AppIdRealtime = appId;
-	serverSettings->fields.AppSettings->fields.AppIdVoice = appId;
+		SString* appId = SString::of(TUSIPHOBIA_PHOTON_APPID);
+		serverSettings->fields.AppSettings->fields.AppIdRealtime = app::String_Replace_1(serverSettings->fields.AppSettings->fields.AppIdRealtime, serverSettings->fields.AppSettings->fields.AppIdRealtime, appId, *app::String_Replace_1__MethodInfo);
+		serverSettings->fields.AppSettings->fields.AppIdVoice = app::String_Replace_1(serverSettings->fields.AppSettings->fields.AppIdVoice, serverSettings->fields.AppSettings->fields.AppIdVoice, appId, *app::String_Replace_1__MethodInfo);
+	}
 
 	return serverSettings;
 }
