@@ -544,13 +544,16 @@ void drawInfo() {
 
 					float sanities = 0.0f;
 					for (SPlayerSpot* playerSpot : playerSpots) {
-						sanities += playerSpot->getPlayer()->getSanity()->getSanity();
+						SPlayer* player = playerSpot->getPlayer();
+						if (player)
+							sanities += player->getSanity()->getSanity();
 					}
 					
 					ImGui::Text("average: %.2f%%", sanities / playerSpots.size());
 					for (SPlayerSpot* playerSpot : playerSpots) {
 						SPhotonPlayer* photonPlayer = playerSpot->getPhotonPlayer();
-						ImGui::Text("%s: %.2f%%%s", photonPlayer->getNickName()->toString().c_str(), playerSpot->getPlayer()->getSanity()->getSanity(), photonPlayer->isLocal() ? " (you)" : "");
+						SPlayer* player = playerSpot->getPlayer();
+						ImGui::Text("%s: %.2f%%%s", photonPlayer->getNickName()->toString().c_str(), player ? player->getSanity()->getSanity() : 0.0f, photonPlayer->isLocal() ? " (you)" : "");
 					}
 				}
 				else
