@@ -45,7 +45,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>version</TargetName>
+    <TargetName>dwmapi</TargetName>
     <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -69,7 +69,7 @@
       <ModuleDefinitionFile>proxy.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>if defined PHASMOPHOBIA_PATH copy /Y "$(TargetPath)" "%PHASMOPHOBIA_PATH%\version.dll"</Command>
+      <Command>if defined PHASMOPHOBIA_PATH copy /Y "$(TargetPath)" "%PHASMOPHOBIA_PATH%\$(TargetName).dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
