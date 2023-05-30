@@ -857,10 +857,17 @@ HRESULT Present_Hook(IDXGISwapChain* __this, UINT sync, UINT flags) {
 	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.25f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 5.0f);
 
+	// don't remove/change the next 10 lines, please :)
+
 	ImVec2 displaySize = ImGui::GetIO().DisplaySize;
-	ImGui::SetNextWindowPos(ImVec2(displaySize.x - 10.0f, displaySize.y - 10.0f), ImGuiCond_Always, ImVec2(1.0f, 1.0f));
-	if (ImGui::Begin("watermark", (bool*) 1, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing))
-		ImGui::Text("https://github.com/alextusinean/tusiphobia"); // don't remove it, please :)
+	ImGui::SetNextWindowPos(ImVec2(10.0f, displaySize.y - 10.0f), ImGuiCond_Always, ImVec2(0.0f, 1.0f));
+
+	bool watermarkWindowOpen = true;
+	if (ImGui::Begin("watermark", &watermarkWindowOpen, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing)) {
+		ImGui::Text("e-mail: alex@tusinean.ro");
+		ImGui::Text("https://alex.tusinean.ro");
+		ImGui::Text("https://github.com/alextusinean/tusiphobia");
+	}
 
 	ImGui::End();
 	ImGui::PopStyleVar();
