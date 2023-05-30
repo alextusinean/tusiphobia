@@ -2,6 +2,7 @@
 
 #include "exports.h"
 
+FARPROC OriginalFuncs_dwmapi[99];
 FARPROC OriginalFuncs_psapi[27];
 FARPROC OriginalFuncs_version[17];
 FARPROC OriginalFuncs_winhttp[65];

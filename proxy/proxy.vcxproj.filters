@@ -63,5 +63,8 @@
     <MASM Include="winmm.asm">
       <Filter>Resource Files</Filter>
     </MASM>
+    <MASM Include="dwmapi.asm">
+      <Filter>Resource Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

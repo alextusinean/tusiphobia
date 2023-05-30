@@ -113,6 +113,7 @@
     <None Include="proxy.def" />
   </ItemGroup>
   <ItemGroup>
+    <MASM Include="dwmapi.asm" />
     <MASM Include="psapi.asm" />
     <MASM Include="version.asm" />
     <MASM Include="winhttp.asm" />
