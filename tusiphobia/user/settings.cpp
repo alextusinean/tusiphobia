@@ -15,43 +15,12 @@ namespace Settings {
 	}
 
 	namespace Visual {
-		namespace Light {
-			namespace Advanced {
-				bool enabled = false;
-
-#define LIGHT(name) \
-namespace name { \
-	bool initialSet = false; \
-	bool enabled = false; \
-	SLightType type = SLightType::Spot; \
-	SColor color = SColor::dummy; \
-	float intensity = -1.0f; \
-	float bounceIntensity = -1.0f; \
-	float spotAngle = -1.0f; \
-	float range = -1.0f; \
-	float shadowStrength = -1.0f; \
-}
-
-				LIGHT(Flashlight);
-				LIGHT(UVLight);
-				LIGHT(HeadLight);
-				LIGHT(AreaLight);
-
-#undef LIGHT
-
-			}
-
-			namespace FullBright {
-				bool enabled = false;
-				bool always = true;
-				bool holdingOnly = false;
-
-				SLightType type = SLightType::Spot;
-				SColor color = SColor::white;
-				float intensity = 0.25f;
-				float spotAngle = 145.0f;
-				float range = 100.0f;
-			}
+		namespace FullBright {
+			bool enabled = false;
+			SColor color = SColor::white;
+			float range = 999.0f;
+			float spotAngle = 360.0f;
+			float intensity = 0.25f;
 		}
 
 		namespace ESP {

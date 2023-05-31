@@ -158,7 +158,14 @@ enum class SEvidenceType : int32_t {
 	ghostWriting = 0x0000000d,
 	usedCrucifix = 0x0000000e,
 	dots = 0x0000000f,
-	none = 0x00000010,
+	monkeyPaw = 0x00000010,
+	none = 0x00000011,
+};
+
+enum class SLightShadows : int32_t {
+	None = 0x00000000,
+	Hard = 0x00000001,
+	Soft = 0x00000002,
 };
 
 struct SGameObject;
@@ -167,6 +174,12 @@ struct STransform;
 
 struct SObject : app::Object {
 
+};
+
+struct SBehaviour : app::Behaviour {
+	bool isEnabled();
+
+	void setEnabled(bool enabled);
 };
 
 struct SQuaternion : app::Quaternion {
@@ -314,19 +327,9 @@ struct SPlayerStamina : app::PlayerStamina {
 
 	bool isRecharging();
 
-	float getMaxStamina();
-
-	float getMaxOutOfBreathDelay();
-
-	float getOutOfBreathDelay();
-
 	float getStamina();
 
 	void setStamina(float stamina);
-
-	float getStartRechargingDelay();
-
-	app::UnityEvent* getRegainedBreathEvent();
 };
 
 struct SColor : app::Color {
@@ -376,6 +379,10 @@ struct SLight : app::Light {
 	float getShadowStrength();
 
 	void setShadowStrength(float shadowStrength);
+
+	SLightShadows getShadows();
+
+	void setShadows(SLightShadows shadows);
 };
 
 struct SPCFlashlight : app::PCFlashlight {
@@ -600,22 +607,24 @@ struct SAnimator : app::Animator {
 	STransform* getBoneTransform(SHumanBodyBones bone);
 };
 
-struct SGhostTraits : app::__152 {
+struct SGhostTraits : app::__97 {
 	SGhostType getType();
 
 	SGhostType getMimicType();
 
-	SGhostEvidenceType* getEvidence();
+	SGhostEvidenceType* getEvidences(int* count);
+
+	SGhostEvidenceType* getOtherEvidences(int* count);
 
 	int getAge();
 
-	int isMale();
+	bool isMale();
 
 	SString* getName();
 
-	int get6();
-
 	int get7();
+
+	int get8();
 
 	bool isShy();
 
@@ -623,7 +632,7 @@ struct SGhostTraits : app::__152 {
 
 	int getFavouriteRoomId();
 
-	bool get11();
+	bool get12();
 };
 
 struct SLevelRoom : app::LevelRoom {
@@ -637,17 +646,13 @@ struct SGhostInfo : app::GhostInfo {
 };
 
 struct SGhostAI : app::GhostAI {
-	static bool started;
+	static SGhostAI* instance;
 
 	bool isAppeared();
-
-	float getDefaultSpeed();
 
 	float getAppearTimer();
 
 	bool isHunting();
-
-	bool getSmudgeSticksUsed();
 
 	SGhostInfo* getGhostInfo();
 
@@ -658,8 +663,6 @@ struct SGhostAI : app::GhostAI {
 	void appear(int unk);
 
 	void disappear();
-
-	static SGhostAI* get();
 };
 
 struct SLevelController : app::LevelController {

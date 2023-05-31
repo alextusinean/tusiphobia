@@ -31,71 +31,14 @@ void drawMainMenu() {
 		if (ImGui::TreeNode("visual")) {
 			using namespace Visual;
 
-			if (ImGui::TreeNode("light")) {
-				using namespace Light;
+			if (ImGui::TreeNode("full bright")) {
+				using namespace FullBright;
 
-				if (ImGui::Checkbox("advanced##toggle", &Advanced::enabled) && Advanced::enabled)
-					FullBright::enabled = false;
-
-				if (Advanced::enabled && ImGui::TreeNode("advanced")) {
-					using namespace Advanced;
-
-#define LIGHT(name, treeNodeName) \
-if (name##::initialSet && ImGui::TreeNode(#treeNodeName)) { \
-using namespace name; \
-ImGui::Checkbox("enabled", &name##::enabled); \
-ImGui::Combo("type", (int*) &type, "spot\0directional\0point\0\0"); \
-ImGui::ColorEdit3("color", (float*) &color); \
-ImGui::SliderFloat("intensity", &intensity, 0.0f, 2.0f); \
-ImGui::SliderFloat("bounce intensity", &bounceIntensity, 0.0f, 1.0f); \
-ImGui::SliderFloat("spot angle", &spotAngle, 0.0f, 179.0f); \
-ImGui::SliderFloat("range", &range, 0.0f, 999.0f); \
-ImGui::SliderFloat("shadow strength", &shadowStrength, 0.0f, 1.0f); \
-ImGui::TreePop(); \
-}
-
-					LIGHT(Flashlight, flashlight);
-					LIGHT(UVLight, uv light);
-					LIGHT(HeadLight, head light);
-					LIGHT(AreaLight, area light);
-
-#undef LIGHT
-
-					ImGui::TreePop();
-				}
-
-				if (!Advanced::enabled && ImGui::TreeNode("full bright")) {
-					using namespace FullBright;
-
-					if (Advanced::enabled && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
-						ImGui::SetTooltip("disabled when 'advanced' is checked");
-
-					ImGui::Checkbox("enabled", &enabled);
-					ImGui::Checkbox("always", &always);
-					if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
-						ImGui::SetTooltip("enable full bright only even when a flashlight is not turned on");
-
-					ImGui::BeginDisabled(always);
-					ImGui::Checkbox("holding only", &holdingOnly);
-					if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
-						ImGui::SetTooltip(always ? "enable full bright only when holding a flashlight" : "disabled when 'always' is checked");
-
-					ImGui::EndDisabled();
-
-					ImGui::Combo("type", (int*) &type, "spot\0directional\0point\0\0");
-					ImGui::ColorEdit3("color", (float*) &color);
-					ImGui::SliderFloat("intensity", &intensity, 0.0f, 10.0f);
-
-					ImGui::SliderFloat("spot angle", &spotAngle, 0.0f, 179.0f);
-					if ((always && spotAngle > 145.0f) || (!always && spotAngle > 165.0f)) {
-						ImGui::Text("recommended spot angle value: %.3f", always ? 145.0f : 165.0f);
-						ImGui::Text("going above could affect your sanity draining");
-					}
-
-					ImGui::SliderFloat("range", &range, 0.0f, 999.0f);
-
-					ImGui::TreePop();
-				}
+				ImGui::Checkbox("enabled", &enabled);
+				ImGui::ColorEdit3("color", (float*) &color);
+				ImGui::SliderFloat("range", &range, 0.0f, 999.0f);
+				ImGui::SliderFloat("spotAngle", &spotAngle, 0.0f, 360.0f);
+				ImGui::SliderFloat("intensity", &intensity, 0.0f, 10.0f);
 
 				ImGui::TreePop();
 			}
@@ -279,16 +222,15 @@ ImGui::TreePop(); \
 		}
 
 		if (false && ImGui::TreeNode("ghost")) {
-			if (SGhostAI::started) {
-				SGhostAI* ghostAI = SGhostAI::get();
+			if (SGhostAI::instance) {
 				if (ImGui::Button("appear"))
-					ghostAI->appear(2);
+					SGhostAI::instance->appear(2);
 
 				if (ImGui::Button("look at nearest player"))
-					ghostAI->lookAtNearestPlayer();
+					SGhostAI::instance->lookAtNearestPlayer();
 
 				if (ImGui::Button("disappear"))
-					ghostAI->disappear();
+					SGhostAI::instance->disappear();
 			}
 
 			ImGui::TreePop();
@@ -437,28 +379,45 @@ void drawInfo() {
 			if (ghostInfoOpened) {
 				bool oldGhostInfoOpened = ghostInfoOpened;
 				if (ImGui::Begin("ghost info", &ghostInfoOpened, ImGuiWindowFlags_AlwaysAutoResize)) {
-					if (SGhostAI::started) {
-						SGhostAI* ghostAI = SGhostAI::get();
-						SGhostInfo* ghostInfo = ghostAI->getGhostInfo();
+					if (SGhostAI::instance) {
+						SGhostInfo* ghostInfo = SGhostAI::instance->getGhostInfo();
 						SGhostTraits ghostTraits = ghostInfo->getGhostTraits();
 
 						if (type) {
 							SGhostType ghostType = ghostTraits.getType();
-							ImGui::Text("type: %s", stringifyGhostType(ghostTraits.getType()));
+							ImGui::Text("type: %s", stringifyGhostType(ghostType));
 
 							if (ghostType == SGhostType::mimic)
 								ImGui::Text("mimic type: %s", stringifyGhostType(ghostTraits.getMimicType()));
 						}
 
 						if (evidence) {
-							SGhostEvidenceType* evidence = ghostTraits.getEvidence();
-							ImGui::Text("evidence: %s | %s | %s", stringifyEvidenceType(evidence[0]), stringifyEvidenceType(evidence[1]), stringifyEvidenceType(evidence[2]));
+							std::stringstream evidenceText;
+							evidenceText << "evidence: ";
+
+							int evidenceCount = 0;
+							SGhostEvidenceType* evidences = ghostTraits.getEvidences(&evidenceCount);
+							if (evidenceCount && evidences) {
+								for (int i = 0; i < evidenceCount; i++) {
+									if (i)
+										evidenceText << " | ";
+
+									evidenceText << stringifyEvidenceType(evidences[i]);
+								}
+							}
+							else
+								evidenceText << "none";
+
+							ImGui::Text(evidenceText.str().c_str());
 						}
 
 						if (name) {
-							std::string nameString = ghostTraits.getName()->toString();
-							if (!nameString.empty())
-								ImGui::Text("name: %s", nameString.c_str());
+							SString* nameManagedString = ghostTraits.getName();
+							std::string nameString = nameManagedString ? nameManagedString->toString() : "";
+							if (nameString.empty())
+								nameString = "???";
+
+							ImGui::Text("name: %s", nameString.c_str());
 						}
 
 						if (age)
@@ -504,9 +463,9 @@ void drawInfo() {
 			if (ghostActivityOpened) {
 				bool oldGhostActivityOpened = ghostActivityOpened;
 				if (ImGui::Begin("ghost activity", &ghostActivityOpened, ImGuiWindowFlags_AlwaysAutoResize)) {
-					if (SGhostAI::started) {
+					if (SGhostAI::instance) {
 						if (hunting)
-							ImGui::Text("is hunting: %s", SGhostAI::get()->isHunting() ? "yes" : "no");
+							ImGui::Text("is hunting: %s", SGhostAI::instance->isHunting() ? "yes" : "no");
 
 						if (strength) {
 							ImGui::Text("strength: %d", (int) std::floor(graphPoints[0] / 48));
@@ -539,7 +498,7 @@ void drawInfo() {
 
 		if (show) {
 			if (ImGui::Begin("sanity", &show, ImGuiWindowFlags_AlwaysAutoResize)) {
-				if (SGhostAI::started) {
+				if (SGhostAI::instance) {
 					std::vector<SPlayerSpot*> playerSpots = SNetwork::get()->getPlayerSpots();
 
 					float sanities = 0.0f;

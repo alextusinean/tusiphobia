@@ -1,21 +1,32 @@
 #include "pch.h"
 
-#include "sdk.h"
 #include "helpers.h"
 
-Il2CppClass* getClass(std::string name, std::string namespaze) {
+Il2CppClass* getClass(std::string namespaze, std::string name) {
 	Il2CppClass* klass = nullptr;
 
 	size_t assemblyCount;
 	const Il2CppAssembly** assemblies = il2cpp_domain_get_assemblies(il2cpp_domain_get(), &assemblyCount);
 	for (int i = 0; i < assemblyCount; i++) {
-		klass = il2cpp_class_from_name(il2cpp_assembly_get_image(assemblies[i]), "System", "Type");
+		klass = il2cpp_class_from_name(il2cpp_assembly_get_image(assemblies[i]), namespaze.c_str(), name.c_str());
 		if (klass)
 			break;
 	}
 
 	return klass;
 }
+
+#pragma region Behaviour
+
+bool SBehaviour::isEnabled() {
+	return app::Behaviour_get_enabled(this, nullptr);
+}
+
+void SBehaviour::setEnabled(bool enabled) {
+	return app::Behaviour_set_enabled(this, enabled, nullptr);
+}
+
+#pragma endregion
 
 #pragma region Quarernion
 
@@ -351,32 +362,12 @@ bool SPlayerStamina::isRecharging() {
 	return fields.__________7;
 }
 
-float SPlayerStamina::getMaxStamina() {
-	return fields.__________8;
-}
-
-float SPlayerStamina::getMaxOutOfBreathDelay() {
+float SPlayerStamina::getStamina() {
 	return fields.__________9;
 }
 
-float SPlayerStamina::getOutOfBreathDelay() {
-	return fields.__________10;
-}
-
-float SPlayerStamina::getStamina() {
-	return fields.__________11;
-}
-
 void SPlayerStamina::setStamina(float stamina) {
-	fields.__________11 = stamina;
-}
-
-float SPlayerStamina::getStartRechargingDelay() {
-	return fields.__________12;
-}
-
-app::UnityEvent* SPlayerStamina::getRegainedBreathEvent() {
-	return fields.__________14;
+	fields.__________9 = stamina;
 }
 
 #pragma endregion
@@ -464,6 +455,14 @@ void SLight::setShadowStrength(float shadowStrength) {
 	app::Light_set_shadowStrength(this, shadowStrength, nullptr);
 }
 
+SLightShadows SLight::getShadows() {
+	return (SLightShadows) app::Light_get_shadows(this, nullptr);
+}
+
+void SLight::setShadows(SLightShadows shadows) {
+	return app::Light_set_shadows(this, (app::LightShadows__Enum) shadows, nullptr);
+}
+
 #pragma endregion
 
 #pragma region PCFlashlight
@@ -519,7 +518,7 @@ SLight* SPCPropGrab::getAreaLight() {
 std::vector<SKey*> SKey::notGrabbedKeys = { };
 
 SKeyType SKey::getType() {
-	if (fields.info->fields.keyType == app::___Enum_13::Main)
+	if (fields.info->fields.keyType == app::___Enum_6::Main)
 		return SKeyType::Main;
 
 	std::string objectName = ((SUnityObject*) this)->getName()->toString();
@@ -630,7 +629,7 @@ void SArray::setValue(int index, SObject* value) {
 #pragma region Object_Array
 
 SObject_Array* SObject_Array::of() {
-	return (SObject_Array*) app::Array_Empty_14(*app::Array_Empty_14__MethodInfo);
+	return (SObject_Array*) app::Array_Empty_15(*app::Array_Empty_15__MethodInfo);
 }
 
 #pragma endregion
@@ -649,7 +648,7 @@ SInt32* SInt32::of(int value) {
 #pragma region Int32_Array
 
 void SInt32_Array::resize(int newSize) {
-	app::Array_Resize_50(this, newSize, *app::Array_Resize_50__MethodInfo);
+	app::Array_Resize_51(this, newSize, *app::Array_Resize_51__MethodInfo);
 }
 
 void SInt32_Array::setValue(int index, int value) {
@@ -665,7 +664,7 @@ SInt32_Array* SInt32_Array::empty() {
 #pragma region Vector3_Array
 
 void SVector3_Array::resize(int newSize) {
-	app::Array_Resize_81(this, newSize, *app::Array_Resize_81__MethodInfo);
+	app::Array_Resize_83(this, newSize, *app::Array_Resize_83__MethodInfo);
 }
 
 void SVector3_Array::setValue(int index, SVector3 value) {
@@ -681,7 +680,7 @@ SVector3_Array* SVector3_Array::empty() {
 #pragma region Color_Array
 
 void SColor_Array::resize(int newSize) {
-	app::Array_Resize_41(this, newSize, *app::Array_Resize_41__MethodInfo);
+	app::Array_Resize_42(this, newSize, *app::Array_Resize_42__MethodInfo);
 }
 
 void SColor_Array::setValue(int index, SColor value) {
@@ -958,44 +957,60 @@ SGhostType SGhostTraits::getMimicType() {
 	return (SGhostType) __________1;
 }
 
-SGhostEvidenceType* SGhostTraits::getEvidence() {
+SGhostEvidenceType* SGhostTraits::getEvidences(int* count) {
+	if (!__________2)
+		return nullptr;
+
+	if (count)
+		*count = __________2->fields._size;
+
 	return (SGhostEvidenceType*) __________2->fields._items->vector;
 }
 
-int SGhostTraits::getAge() {
-	return __________3;
+SGhostEvidenceType* SGhostTraits::getOtherEvidences(int* count) {
+	if (!__________3)
+		return nullptr;
+
+	if (count)
+		*count = __________3->fields._size;
+
+	return (SGhostEvidenceType*) __________3->fields._items->vector;
 }
 
-int SGhostTraits::isMale() {
+int SGhostTraits::getAge() {
 	return __________4;
 }
 
-SString* SGhostTraits::getName() {
-	return (SString*) __________5;
+bool SGhostTraits::isMale() {
+	return __________5;
 }
 
-int SGhostTraits::get6() {
-	return __________6;
+SString* SGhostTraits::getName() {
+	return (SString*) __________6;
 }
 
 int SGhostTraits::get7() {
 	return __________7;
 }
 
-bool SGhostTraits::isShy() {
+int SGhostTraits::get8() {
 	return __________8;
 }
 
-int SGhostTraits::getDeathLength() {
+bool SGhostTraits::isShy() {
 	return __________9;
 }
 
-int SGhostTraits::getFavouriteRoomId() {
+int SGhostTraits::getDeathLength() {
 	return __________10;
 }
 
-bool SGhostTraits::get11() {
+int SGhostTraits::getFavouriteRoomId() {
 	return __________11;
+}
+
+bool SGhostTraits::get12() {
+	return __________12;
 }
 
 #pragma endregion
@@ -1022,14 +1037,10 @@ SLevelRoom* SGhostInfo::getFavouriteRoom() {
 
 #pragma region GhostAI
 
-bool SGhostAI::started = false;
+SGhostAI* SGhostAI::instance = nullptr;
 
 bool SGhostAI::isAppeared() {
 	return fields.__________11;
-}
-
-float SGhostAI::getDefaultSpeed() {
-	return fields.__________16;
 }
 
 float SGhostAI::getAppearTimer() {
@@ -1037,19 +1048,19 @@ float SGhostAI::getAppearTimer() {
 }
 
 bool SGhostAI::isHunting() {
-	return fields.__________22;
-}
-
-bool SGhostAI::getSmudgeSticksUsed() {
-	return fields.__________24;
+	return fields.__________20;
 }
 
 SGhostInfo* SGhostAI::getGhostInfo() {
-	return (SGhostInfo*) fields.__________4;
+	return (SGhostInfo*) fields.__________3;
 }
 
 SAnimator* SGhostAI::getAnimator() {
-	return (SAnimator*) ((SComponent*) this)->getGameObject()->getComponentInChildren(SType::get("UnityEngine.Animator"));
+	app::GhostModel* ghostModel = fields.__________8;
+	if (!ghostModel)
+		return nullptr;
+
+	return (SAnimator*) ghostModel->fields.__________3;
 }
 
 bool SGhostAI::lookAtNearestPlayer() {
@@ -1062,10 +1073,6 @@ void SGhostAI::appear(int unk) { // no clue what the int does
 
 void SGhostAI::disappear() {
 	app::GhostAI_UnAppear(this, nullptr);
-}
-
-SGhostAI* SGhostAI::get() {
-	return SLevelController::get()->getGhostAI();
 }
 
 #pragma endregion
@@ -1101,15 +1108,15 @@ bool SPlayer::isLocal() {
 }
 
 SFirstPersonController* SPlayer::getFirstPersonController() {
-	return (SFirstPersonController*) fields.__________32;
+	return (SFirstPersonController*) fields.__________35;
 }
 
 SPlayerSanity* SPlayer::getSanity() {
-	return (SPlayerSanity*) fields.__________23;
+	return (SPlayerSanity*) fields.__________22;
 }
 
 SAnimator* SPlayer::getAnimator() {
-	return (SAnimator*) ((SComponent*) this)->getGameObject()->getComponentInChildren(SType::get("UnityEngine.Animator"));
+	return (SAnimator*) fields.__________43;
 }
 
 #pragma endregion
@@ -1154,7 +1161,14 @@ std::vector<SPlayerSpot*> SNetwork::getPlayerSpots() {
 }
 
 SNetwork* SNetwork::get() {
-	return (SNetwork*) (*app::Network__TypeInfo)->static_fields->_________;
+	static app::Network__Class* networkClass;
+	if (!networkClass) {
+		networkClass = (app::Network__Class*) getClass("", "Network");
+		if (!networkClass)
+			return nullptr;
+	}
+
+	return (SNetwork*) networkClass->static_fields->_________;
 }
 
 #pragma endregion
@@ -1236,7 +1250,7 @@ int SScreen::getHeight() {
 SOuijaBoard* SOuijaBoard::instance = nullptr;
 
 void SOuijaBoard::sendResponse(SString* response) {
-	app::OuijaBoard___________62(this, response, nullptr);
+	app::OuijaBoard___________36(this, response, nullptr);
 }
 
 #pragma endregion
@@ -1263,7 +1277,7 @@ bool SEvidence::isCursedPosession() {
 	using enum SEvidenceType;
 
 	SEvidenceType type = getType();
-	return type == ouijaBoard || type == musicBox || type == tarotCards || type == summoningCircle || type == hauntedMirror || type == voodooDoll;
+	return type == ouijaBoard || type == musicBox || type == tarotCards || type == summoningCircle || type == hauntedMirror || type == voodooDoll || type == monkeyPaw;
 }
 
 #pragma endregion

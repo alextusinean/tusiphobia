@@ -1,7 +1,5 @@
 #pragma once
 
-#include "sdk.h"
-
 class ESP {
 public:
 	struct LabelData {
@@ -15,17 +13,19 @@ public:
 
 	static void reset();
 
-	static void registerAnimator(SAnimator* animator);
-
-	static void drawAnimator(SAnimator* animator, SColor color, SCamera* camera, int layer);
-
 	static void addLabel(void* labelId, LabelData labelData = {});
+
+	static void registerAnimator(SAnimator* animator, SColor* color, bool* shouldDraw);
 
 	static void addEvidence(SEvidence* evidence);
 
 	static void prepareEvidence();
 
+	static void updateAnimator(SAnimator* animator);
+
 	static void drawLabels();
+
+	static void drawAnimators();
 
 	static LabelData* getLabelData(void* labelId);
 
@@ -35,22 +35,9 @@ public:
 
 private:
 	struct AnimatorData {
-		SMesh* mesh;
-		SMaterial* material;
-
-		AnimatorData();
-
-		void reset();
-
-		void registerVertex(SVector3 position, SColor color);
-
-		void build(SMeshTopology meshTopology = SMeshTopology::Lines);
-
-	private:
-		SVector3_List* vertices;
-		SColor_List* colors;
-		SInt32_List* indices;
-		int buildIndex;
+		SVector3* bonePositions;
+		SColor* color;
+		bool* shouldDraw;
 	};
 
 	static std::map<SAnimator*, AnimatorData> animatorDataMap;

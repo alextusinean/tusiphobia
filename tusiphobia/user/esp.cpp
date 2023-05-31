@@ -34,63 +34,22 @@ const SHumanBodyBones espBonePairs[] = {
 
 const int espBonePairsLength = (int) (sizeof(espBonePairs) / sizeof(SHumanBodyBones));
 
-ESP::AnimatorData::AnimatorData() {
-	mesh = SMesh::of();
-	mesh->markDynamic();
-
-	material = SMaterial::of(SShader::find(SString::of("Hidden/Internal-Colored")));
-	material->setInt(SString::of("_ZTest"), 0);
-}
-
-void ESP::AnimatorData::reset() {
-	vertices = SVector3_List::of();
-	colors = SColor_List::of();
-	indices = SInt32_List::of();
-
-	buildIndex = 0;
-}
-
-void ESP::AnimatorData::registerVertex(SVector3 position, SColor color) {
-	vertices->add(position);
-	colors->add(color);
-	indices->add(buildIndex);
-
-	buildIndex++;
-}
-
-void ESP::AnimatorData::build(SMeshTopology meshTopology) {
-	mesh->setVertices(vertices->toArray());
-	mesh->setColors(colors->toArray());
-	mesh->setIndices(indices->toArray(), meshTopology);
-}
-
 std::map<SAnimator*, ESP::AnimatorData> ESP::animatorDataMap = {};
 std::map<void*, ESP::LabelData> ESP::labelDataMap = {};
 std::set<SEvidence*> ESP::evidenceSet = {};
 
 void ESP::reset() {
+	for (auto const& entry : animatorDataMap) {
+		free(entry.second.bonePositions);
+	}
+
 	animatorDataMap.clear();
 	labelDataMap.clear();
 	evidenceSet.clear();
 }
 
-void ESP::registerAnimator(SAnimator* animator) {
-	animatorDataMap[animator] = AnimatorData();
-}
-
-void ESP::drawAnimator(SAnimator* animator, SColor color, SCamera* camera, int layer) {
-	if (!animatorDataMap.contains(animator))
-		throw std::exception("animator not registered");
-
-	AnimatorData data = animatorDataMap[animator];
-	data.reset();
-
-	for (int i = 0; i < espBonePairsLength; i++) {
-		data.registerVertex(animator->getBoneTransform(espBonePairs[i])->getPosition(), color);
-	}
-
-	data.build();
-	SGraphics::drawMesh(data.mesh, SMatrix4x4::trs(SVector3::zero, SQuaternion::identity, SVector3::one), data.material, layer, camera, 0);
+void ESP::registerAnimator(SAnimator* animator, SColor* color, bool* shouldDraw) {
+	animatorDataMap[animator] = { (SVector3*) calloc(espBonePairsLength, sizeof(SVector3)), color, shouldDraw};
 }
 
 void ESP::addLabel(void* labelId, LabelData labelData) {
@@ -114,7 +73,6 @@ std::string stringifyEvidenceType(SEvidenceType evidenceType) {
 
 		case ouijaBoard:
 			return "ouija board";
-			break;
 
 		ENUM_CASE_STRING(fingerprint);
 		ENUM_CASE_STRING(footstep);
@@ -123,41 +81,36 @@ std::string stringifyEvidenceType(SEvidenceType evidenceType) {
 
 		case deadBody:
 			return "dead body";
-			break;
 
 		case dirtyWater:
 			return "dirty water";
-			break;
 
 		case musicBox:
 			return "music box";
-			break;
 
 		case tarotCards:
 			return "tarot cards";
-			break;
 
 		case summoningCircle:
 			return "summoning circle";
-			break;
 
 		case hauntedMirror:
 			return "haunted mirror";
-			break;
 
 		case voodooDoll:
 			return "voodoo doll";
-			break;
 
 		case ghostWriting:
 			return "ghost writing";
-			break;
 
 		case usedCrucifix:
 			return "used crucifix";
-			break;
 
 		ENUM_CASE_STRING(dots);
+
+		case monkeyPaw:
+			return "monkey paw";
+
 		ENUM_CASE_STRING(none);
 	}
 
@@ -261,34 +214,101 @@ void ESP::prepareEvidence() {
 	}
 }
 
+void ESP::updateAnimator(SAnimator* animator) {
+	SCamera* camera = SCamera::getMain();
+	if (!camera)
+		return;
+
+	if (!animatorDataMap.contains(animator))
+		throw std::exception("animator not registered");
+
+	SVector3 bonePositions[espBonePairsLength] { };
+	for (int i = 0; i < espBonePairsLength; i++) {
+		bonePositions[i] = camera->worldToScreenPoint(animator->getBoneTransform(espBonePairs[i])->getPosition());
+	}
+
+	memcpy_s(animatorDataMap[animator].bonePositions, espBonePairsLength * sizeof(SVector3), bonePositions, espBonePairsLength * sizeof(SVector3));
+}
+
+void ESP::drawAnimators() {
+	ImVec2 displaySize = ImGui::GetIO().DisplaySize;
+	int width = SScreen::getWidth();
+	int height = SScreen::getHeight();
+
+	for (auto const& entry : animatorDataMap) {
+		SAnimator* animator = entry.first;
+		AnimatorData animatorData = entry.second;
+
+		if (!animatorData.bonePositions)
+			continue;
+
+		if (!*animatorData.shouldDraw)
+			continue;
+
+		std::stringstream windowName;
+		windowName << "esp animator " << animator;
+
+		ImGui::SetNextWindowPos(ImVec2(0, 0));
+		ImGui::SetNextWindowSize(ImVec2(width, height));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		if (ImGui::Begin(windowName.str().c_str(), nullptr, espWindowFlags)) {
+			ImU32 color = ImGui::ColorConvertFloat4ToU32(
+				ImVec4(animatorData.color->r, animatorData.color->g, animatorData.color->b, animatorData.color->a));
+
+			ImGuiWindow* window = ImGui::GetCurrentWindow();
+			for (int i = 0; i < espBonePairsLength; i += 2) {
+				SVector3 start = animatorData.bonePositions[i];
+				SVector3 end = animatorData.bonePositions[i + 1];
+
+				if ((start.z <= 0 && end.z <= 0) || ((start.x < 0 || start.x > width || start.y < 0 || start.y > height) && (end.x < 0 || end.x > width || end.y < 0 || end.y > height)))
+					continue;
+
+				float startX = displaySize.x * (start.x / width);
+				float startY = displaySize.y * ((height - start.y) / height);
+
+				float endX = displaySize.x * (end.x / width);
+				float endY = displaySize.y * ((height - end.y) / height);
+
+				window->DrawList->AddLine(ImVec2(startX, startY), ImVec2(endX, endY), color);
+			}
+		}
+
+		ImGui::End();
+		ImGui::PopStyleVar();
+	}
+}
+
 void ESP::drawLabels() {
 	SCamera* camera = SCamera::getMain();
-	if (camera) {
-		ImVec2 displaySize = ImGui::GetIO().DisplaySize;
-		int w = SScreen::getWidth();
-		int h = SScreen::getHeight();
+	if (!camera)
+		return;
 
-		for (auto const& entry : labelDataMap) {
-			LabelData labelData = entry.second;
-			if (!labelData.enabled)
-				continue;
+	ImVec2 displaySize = ImGui::GetIO().DisplaySize;
+	int width = SScreen::getWidth();
+	int height = SScreen::getHeight();
 
-			SVector3 position = camera->worldToScreenPoint(labelData.position);
-			if (position.z <= 0)
-				continue;
+	for (auto const& entry : labelDataMap) {
+		LabelData labelData = entry.second;
+		if (!labelData.enabled)
+			continue;
 
-			float x = displaySize.x * (position.x / w);
-			float y = displaySize.y * ((h - position.y) / h);
-			ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_Always, ImVec2(0.5, 0.5));
+		SVector3 position = camera->worldToScreenPoint(labelData.position);
+		if (position.z <= 0)
+			continue;
 
-			std::stringstream windowName;
-			windowName << "esp label " << entry.first;
+		float x = displaySize.x * (position.x / width);
+		float y = displaySize.y * ((height - position.y) / height);
+		ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_Always, ImVec2(0.5, 0.5));
 
-			if (ImGui::Begin(windowName.str().c_str(), nullptr, espWindowFlags))
-				ImGui::TextColored(ImVec4(labelData.color.r, labelData.color.g, labelData.color.b, labelData.color.a), labelData.text.c_str());
+		std::stringstream windowName;
+		windowName << "esp label " << entry.first;
 
-			ImGui::End();
-		}
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		if (ImGui::Begin(windowName.str().c_str(), nullptr, espWindowFlags))
+			ImGui::TextColored(ImVec4(labelData.color.r, labelData.color.g, labelData.color.b, labelData.color.a), labelData.text.c_str());
+
+		ImGui::End();
+		ImGui::PopStyleVar();
 	}
 }
 

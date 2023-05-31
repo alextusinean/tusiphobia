@@ -1,7 +1,5 @@
 #pragma once
 
-#include "sdk.h"
-
 namespace Settings {
 	namespace Movement {
 		namespace NoClip {
@@ -15,43 +13,12 @@ namespace Settings {
 	}
 
 	namespace Visual {
-		namespace Light {
-			namespace Advanced {
-				extern bool enabled;
-
-#define LIGHT(name) \
-namespace name { \
-	extern bool initialSet; \
-	extern bool enabled; \
-	extern SLightType type; \
-	extern SColor color; \
-	extern float intensity; \
-	extern float bounceIntensity; \
-	extern float spotAngle; \
-	extern float range; \
-	extern float shadowStrength; \
-}
-			
-				LIGHT(Flashlight);
-				LIGHT(UVLight);
-				LIGHT(HeadLight);
-				LIGHT(AreaLight);
-
-#undef LIGHT
-
-			}
-
-			namespace FullBright {
-				extern bool enabled;
-				extern bool always;
-				extern bool holdingOnly;
-
-				extern SLightType type;
-				extern SColor color;
-				extern float intensity;
-				extern float spotAngle;
-				extern float range;
-			}
+		namespace FullBright {
+			extern bool enabled;
+			extern SColor color;
+			extern float range;
+			extern float spotAngle;
+			extern float intensity;
 		}
 
 		namespace ESP {
