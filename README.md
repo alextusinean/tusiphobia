@@ -1,5 +1,5 @@
 # tusiphobia
-nothing important yet
+Download [here](https://nightly.link/alextusinean/tusiphobia/workflows/msbuild/master/tusiphobia.zip). Extract the two DLL files in the same folder as `Phasmophobia.exe`.
 
 ## Credits and huge thanks
 - [MelonLoader](https://github.com/LavaGang/MelonLoader)
