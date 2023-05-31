@@ -348,24 +348,52 @@ void Evidence_OnDisable_Hook(SEvidence* __this, MethodInfo* method) {
 
 #pragma region PhotonNetwork_get_PhotonServerSettings
 
-#ifdef TUSIPHOBIA_PHOTON_APPID
-
 app::ServerSettings* (*PhotonNetwork_get_PhotonServerSettings)(MethodInfo* method);
 
 app::ServerSettings* PhotonNetwork_get_PhotonServerSettings_Hook(MethodInfo* method) {
+	static bool initialized = false;
 	static app::ServerSettings* serverSettings;
-	if (!serverSettings) {
-		serverSettings = PhotonNetwork_get_PhotonServerSettings(method);
+	if (!initialized) {
+		initialized = true;
+		SString* appId = nullptr;
 
-		SString* appId = SString::of(TUSIPHOBIA_PHOTON_APPID);
-		serverSettings->fields.AppSettings->fields.AppIdRealtime = app::String_Replace_1(serverSettings->fields.AppSettings->fields.AppIdRealtime, serverSettings->fields.AppSettings->fields.AppIdRealtime, appId, nullptr);
-		serverSettings->fields.AppSettings->fields.AppIdVoice = app::String_Replace_1(serverSettings->fields.AppSettings->fields.AppIdVoice, serverSettings->fields.AppSettings->fields.AppIdVoice, appId, nullptr);
+		int argc = 0;
+		LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+		bool found = false;
+		for (int i = 0; i < argc; i++) {
+			size_t argLength;
+			char buffer[8191];
+			wcstombs_s(&argLength, buffer, 8191, argv[i], 8191);
+
+			std::string arg(buffer);
+			std::transform(arg.begin(), arg.end(), arg.begin(), [](unsigned char c) { return std::tolower(c); });
+			if (found) {
+				appId = SString::of(arg);
+				break;
+			}
+
+			if (arg == "--tusiphobia-photon-app-id")
+				found = true;
+		}
+
+#ifdef TUSIPHOBIA_PHOTON_APPID
+		if (!appId)
+			appId = SString::of(TUSIPHOBIA_PHOTON_APPID);
+#endif
+
+		if (appId) {
+			serverSettings = PhotonNetwork_get_PhotonServerSettings(method);
+			serverSettings->fields.AppSettings->fields.AppIdRealtime = app::String_Replace_1(serverSettings->fields.AppSettings->fields.AppIdRealtime, serverSettings->fields.AppSettings->fields.AppIdRealtime, appId, nullptr);
+			serverSettings->fields.AppSettings->fields.AppIdVoice = app::String_Replace_1(serverSettings->fields.AppSettings->fields.AppIdVoice, serverSettings->fields.AppSettings->fields.AppIdVoice, appId, nullptr);
+		}
 	}
 
-	return serverSettings;
+	if (serverSettings)
+		return serverSettings;
+	
+	return PhotonNetwork_get_PhotonServerSettings(method);
 }
-
-#endif
 
 #pragma endregion
 
@@ -545,10 +573,7 @@ hook(&(LPVOID&) target, target##_Hook);
 	HOOK(Player_1_Update);
 	HOOK(Evidence_OnEnable);
 	HOOK(Evidence_OnDisable);
-
-#ifdef TUSIPHOBIA_PHOTON_APPID
 	HOOK(PhotonNetwork_get_PhotonServerSettings);
-#endif
 
 #undef HOOK
 

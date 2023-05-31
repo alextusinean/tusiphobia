@@ -4,6 +4,7 @@
 
 #include "il2cpp-appdata.h"
 
+#include <algorithm>
 #include <iostream>
 #include <source_location>
 #include <iomanip>
@@ -15,6 +16,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <shellapi.h>
 
 #include <d3d11.h>
 #include <dxgi.h>
