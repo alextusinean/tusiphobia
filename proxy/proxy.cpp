@@ -37,10 +37,10 @@ std::string GetLastErrorString() {
 }
 
 void initialize(HMODULE moduleHandle) {
-	if (strstr(GetCommandLineA(), "--tusiphobia.disable") != nullptr)
+	if (strstr(GetCommandLineA(), "--tusiphobia-disable") != nullptr)
 		return;
 
-	if (strstr(GetCommandLineA(), "--tusiphobia.debug") != nullptr)
+	if (strstr(GetCommandLineA(), "--tusiphobia-debug") != nullptr)
 		debug = true;
 
 	if (debug) {
