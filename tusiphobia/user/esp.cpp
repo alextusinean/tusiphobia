@@ -48,16 +48,7 @@ void ESP::reset() {
 	evidenceSet.clear();
 }
 
-void ESP::registerAnimator(SAnimator* animator, SColor* color, bool* shouldDraw) {
-	animatorDataMap[animator] = { (SVector3*) calloc(espBonePairsLength, sizeof(SVector3)), color, shouldDraw};
-}
-
-void ESP::addLabel(void* labelId, LabelData labelData) {
-	labelDataMap[labelId] = labelData;
-}
-
 void ESP::addEvidence(SEvidence* evidence) {
-	addLabel(evidence);
 	evidenceSet.insert(evidence);
 }
 
@@ -214,23 +205,23 @@ void ESP::prepareEvidence() {
 	}
 }
 
-void ESP::updateAnimator(SAnimator* animator) {
-	SCamera* camera = SCamera::getMain();
-	if (!camera)
-		return;
-
+void ESP::updateAnimator(SAnimator* animator, SColor* color, bool* shouldDraw) {
 	if (!animatorDataMap.contains(animator))
-		throw std::exception("animator not registered");
+		animatorDataMap[animator] = { (SVector3*) calloc(espBonePairsLength, sizeof(SVector3)), color, shouldDraw };
 
 	SVector3 bonePositions[espBonePairsLength] { };
 	for (int i = 0; i < espBonePairsLength; i++) {
-		bonePositions[i] = camera->worldToScreenPoint(animator->getBoneTransform(espBonePairs[i])->getPosition());
+		bonePositions[i] = animator->getBoneTransform(espBonePairs[i])->getPosition();
 	}
 
 	memcpy_s(animatorDataMap[animator].bonePositions, espBonePairsLength * sizeof(SVector3), bonePositions, espBonePairsLength * sizeof(SVector3));
 }
 
 void ESP::drawAnimators() {
+	SCamera* camera = SCamera::getMain();
+	if (!camera)
+		return;
+
 	ImVec2 displaySize = ImGui::GetIO().DisplaySize;
 	int width = SScreen::getWidth();
 	int height = SScreen::getHeight();
@@ -257,8 +248,8 @@ void ESP::drawAnimators() {
 
 			ImGuiWindow* window = ImGui::GetCurrentWindow();
 			for (int i = 0; i < espBonePairsLength; i += 2) {
-				SVector3 start = animatorData.bonePositions[i];
-				SVector3 end = animatorData.bonePositions[i + 1];
+				SVector3 start = camera->worldToScreenPoint(animatorData.bonePositions[i]);
+				SVector3 end = camera->worldToScreenPoint(animatorData.bonePositions[i + 1]);
 
 				if ((start.z <= 0 && end.z <= 0) || ((start.x < 0 || start.x > width || start.y < 0 || start.y > height) && (end.x < 0 || end.x > width || end.y < 0 || end.y > height)))
 					continue;
@@ -313,11 +304,10 @@ void ESP::drawLabels() {
 }
 
 ESP::LabelData* ESP::getLabelData(void* labelId) {
-	auto iterator = labelDataMap.find(labelId);
-	if (iterator == labelDataMap.end())
-		return nullptr;
+	if (!labelDataMap.contains(labelId))
+		labelDataMap[labelId] = { };
 
-	return &iterator->second;
+	return &labelDataMap[labelId];
 }
 
 void ESP::removeLabel(void* labelId) {
@@ -329,4 +319,12 @@ void ESP::removeLabel(void* labelId) {
 void ESP::removeEvidence(SEvidence* evidence) {
 	evidenceSet.erase(evidence);
 	removeLabel(evidence);
+}
+
+void ESP::removeAnimator(SAnimator* animator) {
+	auto iterator = animatorDataMap.find(animator);
+	if (iterator != animatorDataMap.end()) {
+		free(animatorDataMap[animator].bonePositions);
+		animatorDataMap.erase(animator);
+	}
 }

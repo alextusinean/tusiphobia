@@ -13,15 +13,11 @@ public:
 
 	static void reset();
 
-	static void addLabel(void* labelId, LabelData labelData = {});
-
-	static void registerAnimator(SAnimator* animator, SColor* color, bool* shouldDraw);
-
 	static void addEvidence(SEvidence* evidence);
 
 	static void prepareEvidence();
 
-	static void updateAnimator(SAnimator* animator);
+	static void updateAnimator(SAnimator* animator, SColor* color, bool* shouldDraw);
 
 	static void drawLabels();
 
@@ -32,6 +28,8 @@ public:
 	static void removeLabel(void* labelId);
 
 	static void removeEvidence(SEvidence* evidence);
+
+	static void removeAnimator(SAnimator* animator);
 
 private:
 	struct AnimatorData {

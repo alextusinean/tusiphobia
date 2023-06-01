@@ -230,14 +230,7 @@ void GhostAI_Update_Hook(SGhostAI* __this, MethodInfo* method) {
 	{
 		using namespace Settings::Visual::ESP::Ghost;
 
-		SAnimator* ghostAnimator = __this->getAnimator();
-		if (!ghostAnimatorRegistered) {
-			if (ghostAnimator) {
-				ESP::registerAnimator(__this->getAnimator(), &color, &bones);
-				ghostAnimatorRegistered = true;
-			}
-		} else
-			ESP::updateAnimator(ghostAnimator);
+		ESP::updateAnimator(__this->getAnimator(), &color, &bones);
 	}
 
 	{
@@ -267,25 +260,6 @@ void LineRenderer_SetPosition_Hook(SLineRenderer* __this, int index, SVector3 po
 
 #pragma endregion
 
-#pragma region Player_1_Start
-
-void (*Player_1_Start)(app::Player_1* __this, MethodInfo* method);
-
-void Player_1_Start_Hook(SPlayer* __this, MethodInfo* method) {
-	using namespace Settings::Visual::ESP::Player;
-
-	if (!__this->isLocal()) {
-		ESP::registerAnimator(__this->getAnimator(), &color, &bones);
-
-		if (label)
-			ESP::addLabel(__this);
-	}
-
-	Player_1_Start(__this, method);
-}
-
-#pragma endregion
-
 #pragma region Player_1_Update
 
 void (*Player_1_Update)(app::Player_1* __this, MethodInfo* method);
@@ -293,25 +267,40 @@ void (*Player_1_Update)(app::Player_1* __this, MethodInfo* method);
 void Player_1_Update_Hook(SPlayer* __this, MethodInfo* method) {
 	using namespace Settings::Visual::ESP::Player;
 
-	if (!__this->isLocal()) {
-		SNetwork* network;
-		if (label && (network = SNetwork::get())) {
-			ESP::LabelData* labelData = ESP::getLabelData(__this);
-			for (SPlayerSpot* playerSpot : network->getPlayerSpots()) {
-				if (playerSpot->getPlayer() == __this) {
-					labelData->enabled = true;
-					labelData->position = __this->getAnimator()->getBoneTransform(SHumanBodyBones::Head)->getPosition();
-					labelData->text = playerSpot->getPhotonPlayer()->getNickName()->toString();
-					labelData->color = color;
+	Player_1_Update(__this, method);
+
+	SNetwork* network = SNetwork::get();
+	if (network) {
+		for (SPlayerSpot* playerSpot : network->getPlayerSpots()) {
+			if (playerSpot->getPlayer() == __this) {
+				if (playerSpot->getPhotonPlayer()->isLocal())
 					break;
-				}
+
+				ESP::updateAnimator(__this->getAnimator(), &color, &bones);
+
+				ESP::LabelData* labelData = ESP::getLabelData(__this);
+				labelData->enabled = label;
+				labelData->position = __this->getAnimator()->getBoneTransform(SHumanBodyBones::Head)->getPosition();
+				labelData->text = playerSpot->getPhotonPlayer()->getNickName()->toString();
+				labelData->color = color;
+
+				break;
 			}
 		}
-
-		ESP::updateAnimator(__this->getAnimator());
 	}
+}
 
-	Player_1_Update(__this, method);
+#pragma endregion
+
+#pragma region Player_1_OnDestroy
+
+void (*Player_1_OnDestroy)(app::Player_1* __this, MethodInfo* method);
+
+void Player_1_OnDestroy_Hook(SPlayer* __this, MethodInfo* method) {
+	ESP::removeAnimator(__this->getAnimator());
+	ESP::removeLabel(__this);
+
+	Player_1_OnDestroy(__this, method);
 }
 
 #pragma endregion
@@ -569,8 +558,8 @@ hook(&(LPVOID&) target, target##_Hook);
 	HOOK(GhostAI_Start);
 	HOOK(GhostAI_Update);
 	HOOK(LineRenderer_SetPosition);
-	HOOK(Player_1_Start);
 	HOOK(Player_1_Update);
+	HOOK(Player_1_OnDestroy);
 	HOOK(Evidence_OnEnable);
 	HOOK(Evidence_OnDisable);
 	HOOK(PhotonNetwork_get_PhotonServerSettings);
