@@ -77,40 +77,69 @@ void initialize(HMODULE moduleHandle) {
 
 	Exports::load(index, originalModule);
 
+	std::string steamAppId;
+
+	int argc = 0;
+	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+	bool steamAppIdFound = false;
+	for (int i = 0; i < argc; i++) {
+		size_t argLength;
+		char buffer[8191];
+		wcstombs_s(&argLength, buffer, 8191, argv[i], 8191);
+
+		std::string arg(buffer);
+		std::transform(arg.begin(), arg.end(), arg.begin(), [](unsigned char c) { return std::tolower(c); });
+		if (steamAppIdFound) {
+			steamAppId = arg;
+			break;
+		}
+
+		if (arg == "--tusiphobia-steam-app-id" && (i + 1) < argc)
+			steamAppIdFound = true;
+	}
+
 #ifdef TUSIPHOBIA_STEAM_APPID
-	DWORD activeUser;
-	DWORD activeUserSize = sizeof(activeUser);
-	LSTATUS activeUserStatus = RegGetValueA(HKEY_CURRENT_USER,
-		"SOFTWARE\\Valve\\Steam\\ActiveProcess\\", "ActiveUser",
-		RRF_RT_REG_DWORD, nullptr, &activeUser, &activeUserSize);
-
-	if (activeUserStatus != ERROR_SUCCESS || activeUser == 0) {
-		error("Steam is not launched or no user is logged in");
-		return;
-	}
-
-	char steamPath[MAX_PATH];
-	DWORD steamPathSize = sizeof(steamPath);
-	LSTATUS steamPathStatus = RegGetValueA(HKEY_CURRENT_USER,
-		"SOFTWARE\\Valve\\Steam\\", "SteamPath",
-		RRF_RT_REG_SZ, nullptr, steamPath, &steamPathSize);
-
-	if (steamPathStatus != ERROR_SUCCESS) {
-		error("failed getting Steam's path");
-		return;
-	}
-
-	if (!SetEnvironmentVariableA("SteamAppId", TUSIPHOBIA_STEAM_APPID)) {
-		printf("%s\n", GetLastErrorString().c_str());
-		error("failed setting SteamAppId environment variable");
-		return;
-	}
-
-	if (!LoadLibraryA((fs::path(steamPath) / "GameOverlayRenderer64.dll").string().c_str())) {
-		error("failed loading GameOverlayRenderer64.dll");
-		return;
+	if (!steamAppIdFound) {
+		steamAppId = TUSIPHOBIA_STEAM_APPID;
+		steamAppIdFound = true;
 	}
 #endif
+
+	if (steamAppIdFound) {
+		DWORD activeUser;
+		DWORD activeUserSize = sizeof(activeUser);
+		LSTATUS activeUserStatus = RegGetValueA(HKEY_CURRENT_USER,
+			"SOFTWARE\\Valve\\Steam\\ActiveProcess\\", "ActiveUser",
+			RRF_RT_REG_DWORD, nullptr, &activeUser, &activeUserSize);
+
+		if (activeUserStatus != ERROR_SUCCESS || activeUser == 0) {
+			error("Steam is not launched or no user is logged in");
+			return;
+		}
+
+		char steamPath[MAX_PATH];
+		DWORD steamPathSize = sizeof(steamPath);
+		LSTATUS steamPathStatus = RegGetValueA(HKEY_CURRENT_USER,
+			"SOFTWARE\\Valve\\Steam\\", "SteamPath",
+			RRF_RT_REG_SZ, nullptr, steamPath, &steamPathSize);
+
+		if (steamPathStatus != ERROR_SUCCESS) {
+			error("failed getting Steam's path");
+			return;
+		}
+
+		if (!SetEnvironmentVariableA("SteamAppId", steamAppId.c_str())) {
+			printf("%s\n", GetLastErrorString().c_str());
+			error("failed setting SteamAppId environment variable");
+			return;
+		}
+
+		if (!LoadLibraryA((fs::path(steamPath) / "GameOverlayRenderer64.dll").string().c_str())) {
+			error("failed loading GameOverlayRenderer64.dll");
+			return;
+		}
+	}
 
 #ifdef _DEBUG
 	fs::path tusiphobiaPath(TUSIPHOBIA_PATH);
