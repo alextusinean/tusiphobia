@@ -279,7 +279,7 @@ void drawMainMenu() {
 		if (ImGui::TreeNode("cursed posession")) {
 			using namespace CursedPosession;
 
-			if (SOuijaBoard::instance && ImGui::TreeNode("ouija board")) {
+			if (SOuijaBoard::instance && ImGui::TreeNode("ouija board (host only)")) {
 				using namespace OuijaBoard;
 
 				static char _customResponse[16] = "tusiphobia";
