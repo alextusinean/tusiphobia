@@ -678,6 +678,8 @@ struct SPlayerSanity : app::PlayerSanity {
 };
 
 struct SPlayer : app::Player_1 {
+	bool isDead();
+
 	bool isLocal();
 
 	SFirstPersonController* getFirstPersonController();
@@ -685,6 +687,12 @@ struct SPlayer : app::Player_1 {
 	SPlayerSanity* getSanity();
 
 	SAnimator* getAnimator();
+
+	void startKilling();
+
+	void kill();
+
+	void revive();
 };
 
 struct SPhotonPlayer : app::Player {
@@ -769,4 +777,18 @@ struct SEMF : app::EMF {
 	SColor getColor();
 
 	static SColor getColor(int level);
+};
+
+struct SPhotonNetwork {
+	static bool isMasterClient();
+};
+
+struct SLiftButton : app::LiftButton {
+	static SLiftButton* instance;
+
+	bool isAnimating();
+
+	bool isClosed();
+
+	bool canBeClosed();
 };

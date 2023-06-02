@@ -79,7 +79,7 @@ namespace Settings {
 		}
 	}
 
-	namespace Info {
+	namespace Util {
 		namespace Ghost {
 			namespace Show {
 				extern bool type;
@@ -105,7 +105,7 @@ namespace Settings {
 			}
 		}
 
-		namespace Sanity {
+		namespace Players {
 			extern bool show;
 		}
 	}

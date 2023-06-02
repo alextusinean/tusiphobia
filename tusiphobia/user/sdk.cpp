@@ -1103,6 +1103,10 @@ float SPlayerSanity::getSanity() {
 
 #pragma region Player
 
+bool SPlayer::isDead() {
+	return fields.__________1;
+}
+
 bool SPlayer::isLocal() {
 	return getFirstPersonController() != nullptr;
 }
@@ -1117,6 +1121,18 @@ SPlayerSanity* SPlayer::getSanity() {
 
 SAnimator* SPlayer::getAnimator() {
 	return (SAnimator*) fields.__________43;
+}
+
+void SPlayer::startKilling() {
+	app::Player_1_StartKillingPlayer(this, nullptr);
+}
+
+void SPlayer::kill() {
+	app::Player_1_KillPlayer(this, nullptr);
+}
+
+void SPlayer::revive() {
+	app::Player_1_RevivePlayer(this, nullptr);
 }
 
 #pragma endregion
@@ -1321,6 +1337,32 @@ SColor SEMF::getColor(int level) {
 	}
 
 	return SColor::dummy;
+}
+
+#pragma endregion
+
+#pragma region PhotonNetwork
+
+bool SPhotonNetwork::isMasterClient() {
+	return app::PhotonNetwork_get_IsMasterClient(nullptr);
+}
+
+#pragma endregion
+
+#pragma region LiftButton
+
+SLiftButton* SLiftButton::instance = nullptr;
+
+bool SLiftButton::isAnimating() {
+	return fields.__________1;
+}
+
+bool SLiftButton::isClosed() {
+	return fields.__________2;
+}
+
+bool SLiftButton::canBeClosed() {
+	return fields.__________3;
 }
 
 #pragma endregion

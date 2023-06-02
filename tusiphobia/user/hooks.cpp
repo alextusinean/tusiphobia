@@ -168,21 +168,19 @@ void GhostAI_Start_Hook(SGhostAI* __this, MethodInfo* method) {
 
 #pragma endregion
 
-bool ghostAnimatorRegistered = false;
-
 #pragma region SceneManager_Internal_ActiveSceneChanged
 
 void (*SceneManager_Internal_ActiveSceneChanged)(app::Scene previousActiveScene, app::Scene newActiveScene, MethodInfo* method);
 
 void SceneManager_Internal_ActiveSceneChanged_Hook(app::Scene previousActiveScene, app::Scene newActiveScene, MethodInfo* method) {
-	ghostAnimatorRegistered = false;
 	SGhostAI::instance = nullptr;
+	SLiftButton::instance = nullptr;
 
 	SKey::notGrabbedKeys.clear();
 	ESP::reset();
 
 	{
-		using namespace Settings::Info::Ghost::Activity;
+		using namespace Settings::Util::Ghost::Activity;
 
 		for (int i = 0; i < std::size(graphPoints); i++) {
 			graphPoints[i] = 0;
@@ -250,7 +248,7 @@ void GhostAI_Update_Hook(SGhostAI* __this, MethodInfo* method) {
 void (*LineRenderer_SetPosition)(app::LineRenderer* __this, int index, app::Vector3 position, MethodInfo* method);
 
 void LineRenderer_SetPosition_Hook(SLineRenderer* __this, int index, SVector3 position, MethodInfo* method) {
-	using namespace Settings::Info::Ghost::Activity;
+	using namespace Settings::Util::Ghost::Activity;
 
 	if (__this->getPositionCount() == 61)
 		graphPoints[index] = position.y;
@@ -382,6 +380,17 @@ app::ServerSettings* PhotonNetwork_get_PhotonServerSettings_Hook(MethodInfo* met
 		return serverSettings;
 	
 	return PhotonNetwork_get_PhotonServerSettings(method);
+}
+
+#pragma endregion
+
+#pragma region LiftButton_Update
+
+void (*LiftButton_Start)(app::LiftButton* __this, MethodInfo* method);
+
+void LiftButton_Start_Hook(SLiftButton* __this, MethodInfo* method) {
+	SLiftButton::instance = __this;
+	LiftButton_Start(__this, method);
 }
 
 #pragma endregion
@@ -563,6 +572,7 @@ hook(&(LPVOID&) target, target##_Hook);
 	HOOK(Evidence_OnEnable);
 	HOOK(Evidence_OnDisable);
 	HOOK(PhotonNetwork_get_PhotonServerSettings);
+	HOOK(LiftButton_Start);
 
 #undef HOOK
 

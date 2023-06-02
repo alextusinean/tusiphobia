@@ -149,8 +149,8 @@ void drawMainMenu() {
 			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNode("info")) {
-			using namespace Info;
+		if (ImGui::TreeNode("util")) {
+			using namespace Util;
 
 			if (ImGui::TreeNode("ghost")) {
 				using namespace Ghost;
@@ -210,8 +210,8 @@ void drawMainMenu() {
 				ImGui::TreePop();
 			}
 
-			if (ImGui::TreeNode("sanity")) {
-				using namespace Sanity;
+			if (ImGui::TreeNode("players")) {
+				using namespace Players;
 
 				ImGui::Checkbox("show", &show);
 
@@ -279,13 +279,20 @@ void drawMainMenu() {
 		if (ImGui::TreeNode("cursed posession")) {
 			using namespace CursedPosession;
 
-			if (SOuijaBoard::instance && ImGui::TreeNode("ouija board (host only)")) {
+			if (SOuijaBoard::instance && ImGui::TreeNode("ouija board")) {
 				using namespace OuijaBoard;
 
 				static char _customResponse[16] = "tusiphobia";
 				ImGui::InputText("custom response", _customResponse, IM_ARRAYSIZE(_customResponse));
+
+				bool isNotHost = !SPhotonNetwork::isMasterClient();
+				ImGui::BeginDisabled(isNotHost);
 				if (ImGui::Button("send custom response"))
 					customResponse = _customResponse;
+
+				ImGui::EndDisabled();
+				if (isNotHost && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+					ImGui::SetTooltip("you need to be the host to use this");
 
 				ImGui::TreePop();
 			}
@@ -366,8 +373,8 @@ const char* stringifyEvidenceType(SGhostEvidenceType evidenceType) {
 
 #undef ENUM_CASE_STRING
 
-void drawInfo() {
-	using namespace Settings::Info;
+void drawUtil() {
+	using namespace Settings::Util;
 
 	{
 		using namespace Ghost;
@@ -432,8 +439,9 @@ void drawInfo() {
 						if (shyness)
 							ImGui::Text("is shy: %s", ghostTraits.isShy() ? "yes" : "no");
 
-						if (favouriteRoom)
-							ImGui::Text("favourite room: %s", ghostInfo->getFavouriteRoom()->getName()->toString().c_str());
+						SLevelRoom* _favouriteRoom = ghostInfo->getFavouriteRoom();
+						if (favouriteRoom && _favouriteRoom)
+							ImGui::Text("favourite room: %s", _favouriteRoom->getName()->toString().c_str());
 					}
 					else
 						ImGui::Text("waiting for game...");
@@ -494,10 +502,10 @@ void drawInfo() {
 	}
 
 	{
-		using namespace Sanity;
+		using namespace Players;
 
 		if (show) {
-			if (ImGui::Begin("sanity", &show, ImGuiWindowFlags_AlwaysAutoResize)) {
+			if (ImGui::Begin("players", &show, ImGuiWindowFlags_AlwaysAutoResize)) {
 				if (SGhostAI::instance) {
 					std::vector<SPlayerSpot*> playerSpots = SNetwork::get()->getPlayerSpots();
 
@@ -508,11 +516,51 @@ void drawInfo() {
 							sanities += player->getSanity()->getSanity();
 					}
 					
-					ImGui::Text("average: %.2f%%", sanities / playerSpots.size());
+					ImGui::Text("average sanity: %.2f%%", sanities / playerSpots.size());
 					for (SPlayerSpot* playerSpot : playerSpots) {
 						SPhotonPlayer* photonPlayer = playerSpot->getPhotonPlayer();
+						bool isLocal = photonPlayer->isLocal();
+
 						SPlayer* player = playerSpot->getPlayer();
-						ImGui::Text("%s: %.2f%%%s", photonPlayer->getNickName()->toString().c_str(), player ? player->getSanity()->getSanity() : 0.0f, photonPlayer->isLocal() ? " (you)" : "");
+						if (player && ImGui::TreeNode(playerSpot, "%s%s", photonPlayer->getNickName()->toString().c_str(), isLocal ? " (you)" : "")) {
+							ImGui::Text("sanity: %.2f%%", player ? player->getSanity()->getSanity() : 0.0f);
+
+							bool isNotHost = !SPhotonNetwork::isMasterClient();
+							bool needsHost = isNotHost && !isLocal;
+
+							ImGui::BeginDisabled(needsHost || player->isDead());
+							if (ImGui::Button(isLocal ? "suicide" : "kill"))
+								isNotHost ? player->kill() : player->startKilling();
+
+							ImGui::EndDisabled();
+							if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+								if (needsHost)
+									ImGui::SetTooltip("you need to be the host to use this");
+								else if (player->isDead())
+									ImGui::SetTooltip("%s already dead", isLocal ? "you are" : "this player is");
+							}
+
+							ImGui::SameLine();
+							ImGui::BeginDisabled(needsHost || !player->isDead() || SLiftButton::instance->isClosed());
+							if (ImGui::Button("revive"))
+								player->revive();
+
+							ImGui::EndDisabled();
+							if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+								if (needsHost)
+									ImGui::SetTooltip("you need to be the host to use this");
+								else if (!player->isDead())
+									ImGui::SetTooltip("%s already alive", isLocal ? "you are" : "this player is");
+								else if (SLiftButton::instance->isClosed())
+									ImGui::SetTooltip("the truck needs to be open to use this");
+
+							}
+
+							if (ImGui::Button("spawn body (takes some seconds)"))
+								app::PhotonView_RPC(player->fields._________, SString::of("SpawnDeadBodyNetworked"), app::RpcTarget__Enum::All, app::Array_Empty_15(*app::Array_Empty_15__MethodInfo), nullptr);
+
+							ImGui::TreePop();
+						}
 					}
 				}
 				else
@@ -533,7 +581,7 @@ void GUI::draw() {
 	if (isUnlocked)
 		drawMainMenu();
 
-	drawInfo();
+	drawUtil();
 
 	ImGui::PopStyleVar();
 }
