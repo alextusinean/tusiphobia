@@ -46,10 +46,10 @@ void (*FirstPersonController_Start)(app::FirstPersonController* __this, MethodIn
 void FirstPersonController_Start_Hook(SFirstPersonController* __this, MethodInfo* method) {
 	FirstPersonController_Start(__this, method);
 
-	tusiphobiaLight = (SLight*) ((SComponent*) __this->getHeadTransform())->getGameObject()->addComponent(SType::get("UnityEngine.Light"));
+	tusiphobiaLight = (SLight*)((SComponent*)__this->getHeadTransform())->getGameObject()->addComponent(SType::get("UnityEngine.Light"));
 	tusiphobiaLight->setType(SLightType::Spot);
 	tusiphobiaLight->setShadows(SLightShadows::None);
-	((SBehaviour*) tusiphobiaLight)->setEnabled(false);
+	((SBehaviour*)tusiphobiaLight)->setEnabled(false);
 }
 
 #pragma endregion
@@ -71,9 +71,9 @@ void FirstPersonController_Update_Hook(SFirstPersonController* __this, MethodInf
 	static bool noClipState = false;
 	if (NoClip::enabled) {
 		noClipState = true;
-		((SCollider*) __this->getCharacterController())->setEnabled(false);
+		((SCollider*)__this->getCharacterController())->setEnabled(false);
 
-		STransform* transform = ((SComponent*) __this->getCharacterController())->getTransform();
+		STransform* transform = ((SComponent*)__this->getCharacterController())->getTransform();
 		SVector3 position = {};
 
 		if (isKeyPressed(0x57))
@@ -101,7 +101,7 @@ void FirstPersonController_Update_Hook(SFirstPersonController* __this, MethodInf
 	}
 	else if (noClipState) {
 		noClipState = false;
-		((SCollider*) __this->getCharacterController())->setEnabled(true);
+		((SCollider*)__this->getCharacterController())->setEnabled(true);
 	}
 
 	FirstPersonController_Update(__this, method);
@@ -113,7 +113,7 @@ void FirstPersonController_Update_Hook(SFirstPersonController* __this, MethodInf
 	{
 		using namespace Settings::Visual::FullBright;
 
-		((SBehaviour*) tusiphobiaLight)->setEnabled(enabled);
+		((SBehaviour*)tusiphobiaLight)->setEnabled(enabled);
 		tusiphobiaLight->setColor(color);
 		tusiphobiaLight->setRange(range);
 		tusiphobiaLight->setSpotAngle(spotAngle);
@@ -314,7 +314,7 @@ void Evidence_OnEnable_Hook(SEvidence* __this, MethodInfo* method) {
 	ESP::addEvidence(__this);
 
 	if (__this->getType() == SEvidenceType::ouijaBoard)
-		SOuijaBoard::instance = (SOuijaBoard*) ((SComponent*) ((SComponent*) __this)->getTransform()->getParent())->getGameObject()->getComponent(SType::get("OuijaBoard"));
+		SOuijaBoard::instance = (SOuijaBoard*)((SComponent*)((SComponent*)__this)->getTransform()->getParent())->getGameObject()->getComponent(SType::get("OuijaBoard"));
 }
 
 #pragma endregion
@@ -378,7 +378,7 @@ app::ServerSettings* PhotonNetwork_get_PhotonServerSettings_Hook(MethodInfo* met
 
 	if (serverSettings)
 		return serverSettings;
-	
+
 	return PhotonNetwork_get_PhotonServerSettings(method);
 }
 
@@ -450,7 +450,7 @@ HRESULT Present_Hook(IDXGISwapChain* __this, UINT sync, UINT flags) {
 		GUI::isInitialized = true;
 
 		ID3D11Device* device;
-		__this->GetDevice(__uuidof(ID3D11Device), (void**) &device);
+		__this->GetDevice(__uuidof(ID3D11Device), (void**)&device);
 		device->GetImmediateContext(&deviceContext);
 
 		DXGI_SWAP_CHAIN_DESC description;
@@ -468,11 +468,11 @@ HRESULT Present_Hook(IDXGISwapChain* __this, UINT sync, UINT flags) {
 		ImGui::GetIO().ImeWindowHandle = windowHandle;
 
 		ID3D11Texture2D* back_buffer;
-		__this->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*) &back_buffer);
+		__this->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer);
 		device->CreateRenderTargetView(back_buffer, NULL, &targetView);
 		back_buffer->Release();
 
-		originalWindowProcedure = (WNDPROC) SetWindowLongPtr(windowHandle, GWLP_WNDPROC, (LONG_PTR) windowProcedureHook);
+		originalWindowProcedure = (WNDPROC)SetWindowLongPtr(windowHandle, GWLP_WNDPROC, (LONG_PTR)windowProcedureHook);
 	}
 
 	ImGui_ImplWin32_NewFrame();
@@ -576,13 +576,13 @@ hook(&(LPVOID&) target, target##_Hook);
 
 #undef HOOK
 
-	Present = (ID3DPresent) Renderer::getPresent();
-	hook(&(LPVOID&) Present, Present_Hook);
+	Present = (ID3DPresent)Renderer::getPresent();
+	hook(&(LPVOID&)Present, Present_Hook);
 }
 
 void Hooks::uninit() {
 	toggleGUI(false);
 
 	unhookAll();
-	SetWindowLongPtr(windowHandle, GWLP_WNDPROC, (LONG_PTR) originalWindowProcedure);
+	SetWindowLongPtr(windowHandle, GWLP_WNDPROC, (LONG_PTR)originalWindowProcedure);
 }

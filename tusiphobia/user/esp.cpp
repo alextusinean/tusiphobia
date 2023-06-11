@@ -4,12 +4,12 @@
 #include "settings.h"
 
 static const ImGuiWindowFlags espWindowFlags =
-	ImGuiWindowFlags_NoTitleBar
-	| ImGuiWindowFlags_NoBackground
-	| ImGuiWindowFlags_AlwaysAutoResize
-	| ImGuiWindowFlags_NoInputs
-	| ImGuiWindowFlags_NoFocusOnAppearing
-	| ImGuiWindowFlags_NoSavedSettings;
+ImGuiWindowFlags_NoTitleBar
+| ImGuiWindowFlags_NoBackground
+| ImGuiWindowFlags_AlwaysAutoResize
+| ImGuiWindowFlags_NoInputs
+| ImGuiWindowFlags_NoFocusOnAppearing
+| ImGuiWindowFlags_NoSavedSettings;
 
 const SHumanBodyBones espBonePairs[] = {
 	SHumanBodyBones::Head, SHumanBodyBones::Neck,
@@ -32,7 +32,7 @@ const SHumanBodyBones espBonePairs[] = {
 	SHumanBodyBones::RightLowerLeg, SHumanBodyBones::RightFoot
 };
 
-const int espBonePairsLength = (int) (sizeof(espBonePairs) / sizeof(SHumanBodyBones));
+const int espBonePairsLength = (int)(sizeof(espBonePairs) / sizeof(SHumanBodyBones));
 
 std::map<SAnimator*, ESP::AnimatorData> ESP::animatorDataMap = {};
 std::map<void*, ESP::LabelData> ESP::labelDataMap = {};
@@ -62,45 +62,45 @@ std::string stringifyEvidenceType(SEvidenceType evidenceType) {
 
 		ENUM_CASE_STRING(emf);
 
-		case ouijaBoard:
-			return "ouija board";
+	case ouijaBoard:
+		return "ouija board";
 
 		ENUM_CASE_STRING(fingerprint);
 		ENUM_CASE_STRING(footstep);
 		ENUM_CASE_STRING(bone);
 		ENUM_CASE_STRING(ghost);
 
-		case deadBody:
-			return "dead body";
+	case deadBody:
+		return "dead body";
 
-		case dirtyWater:
-			return "dirty water";
+	case dirtyWater:
+		return "dirty water";
 
-		case musicBox:
-			return "music box";
+	case musicBox:
+		return "music box";
 
-		case tarotCards:
-			return "tarot cards";
+	case tarotCards:
+		return "tarot cards";
 
-		case summoningCircle:
-			return "summoning circle";
+	case summoningCircle:
+		return "summoning circle";
 
-		case hauntedMirror:
-			return "haunted mirror";
+	case hauntedMirror:
+		return "haunted mirror";
 
-		case voodooDoll:
-			return "voodoo doll";
+	case voodooDoll:
+		return "voodoo doll";
 
-		case ghostWriting:
-			return "ghost writing";
+	case ghostWriting:
+		return "ghost writing";
 
-		case usedCrucifix:
-			return "used crucifix";
+	case usedCrucifix:
+		return "used crucifix";
 
 		ENUM_CASE_STRING(dots);
 
-		case monkeyPaw:
-			return "monkey paw";
+	case monkeyPaw:
+		return "monkey paw";
 
 		ENUM_CASE_STRING(none);
 	}
@@ -124,7 +124,7 @@ void ESP::prepareEvidence() {
 			using namespace EMF;
 
 			if (type == emf && label) {
-				SEMF* emfInstance = (SEMF*) ((SComponent*) evidence)->getGameObject()->getComponent(SType::get("EMF"));
+				SEMF* emfInstance = (SEMF*)((SComponent*)evidence)->getGameObject()->getComponent(SType::get("EMF"));
 				if (!emfInstance)
 					throw std::exception("EMF instance not found");
 
@@ -201,15 +201,15 @@ void ESP::prepareEvidence() {
 
 		labelData->enabled = enabled;
 		if (enabled)
-			labelData->position = ((SComponent*) evidence)->getTransform()->getPosition();
+			labelData->position = ((SComponent*)evidence)->getTransform()->getPosition();
 	}
 }
 
 void ESP::updateAnimator(SAnimator* animator, SColor* color, bool* shouldDraw) {
 	if (!animatorDataMap.contains(animator))
-		animatorDataMap[animator] = { (SVector3*) calloc(espBonePairsLength, sizeof(SVector3)), color, shouldDraw };
+		animatorDataMap[animator] = { (SVector3*)calloc(espBonePairsLength, sizeof(SVector3)), color, shouldDraw };
 
-	SVector3 bonePositions[espBonePairsLength] { };
+	SVector3 bonePositions[espBonePairsLength]{ };
 	for (int i = 0; i < espBonePairsLength; i++) {
 		bonePositions[i] = animator->getBoneTransform(espBonePairs[i])->getPosition();
 	}

@@ -35,7 +35,7 @@ void drawMainMenu() {
 				using namespace FullBright;
 
 				ImGui::Checkbox("enabled", &enabled);
-				ImGui::ColorEdit3("color", (float*) &color);
+				ImGui::ColorEdit3("color", (float*)&color);
 				ImGui::SliderFloat("range", &range, 0.0f, 999.0f);
 				ImGui::SliderFloat("spotAngle", &spotAngle, 0.0f, 360.0f);
 				ImGui::SliderFloat("intensity", &intensity, 0.0f, 10.0f);
@@ -50,7 +50,7 @@ void drawMainMenu() {
 					using namespace Ghost;
 
 					ImGui::Checkbox("bones", &bones);
-					ImGui::ColorEdit3("color", (float*) &color);
+					ImGui::ColorEdit3("color", (float*)&color);
 
 					ImGui::TreePop();
 				}
@@ -61,7 +61,7 @@ void drawMainMenu() {
 					ImGui::Checkbox("label", &label);
 					ImGui::Checkbox("bones", &bones);
 
-					ImGui::ColorEdit3("color", (float*) &color);
+					ImGui::ColorEdit3("color", (float*)&color);
 
 					ImGui::TreePop();
 				}
@@ -74,7 +74,7 @@ void drawMainMenu() {
 					ImGui::Checkbox("custom color", &customColor);
 
 					ImGui::BeginDisabled(!customColor);
-					ImGui::ColorEdit3("color", (float*) &color);
+					ImGui::ColorEdit3("color", (float*)&color);
 					ImGui::EndDisabled();
 
 					ImGui::TreePop();
@@ -84,7 +84,7 @@ void drawMainMenu() {
 					using namespace ESP::CursedPosession;
 
 					ImGui::Checkbox("label", &label);
-					ImGui::ColorEdit3("color", (float*) &color);
+					ImGui::ColorEdit3("color", (float*)&color);
 
 					ImGui::TreePop();
 				}
@@ -93,7 +93,7 @@ void drawMainMenu() {
 					using namespace Fingerprint;
 
 					ImGui::Checkbox("label", &label);
-					ImGui::ColorEdit3("color", (float*) &color);
+					ImGui::ColorEdit3("color", (float*)&color);
 
 					ImGui::TreePop();
 				}
@@ -102,7 +102,7 @@ void drawMainMenu() {
 					using namespace Footstep;
 
 					ImGui::Checkbox("label", &label);
-					ImGui::ColorEdit3("color", (float*) &color);
+					ImGui::ColorEdit3("color", (float*)&color);
 
 					ImGui::TreePop();
 				}
@@ -111,7 +111,7 @@ void drawMainMenu() {
 					using namespace Bone;
 
 					ImGui::Checkbox("label", &label);
-					ImGui::ColorEdit3("color", (float*) &color);
+					ImGui::ColorEdit3("color", (float*)&color);
 
 					ImGui::TreePop();
 				}
@@ -120,7 +120,7 @@ void drawMainMenu() {
 					using namespace DeadBody;
 
 					ImGui::Checkbox("label", &label);
-					ImGui::ColorEdit3("color", (float*) &color);
+					ImGui::ColorEdit3("color", (float*)&color);
 
 					ImGui::TreePop();
 				}
@@ -129,7 +129,7 @@ void drawMainMenu() {
 					using namespace DirtyWater;
 
 					ImGui::Checkbox("label", &label);
-					ImGui::ColorEdit3("color", (float*) &color);
+					ImGui::ColorEdit3("color", (float*)&color);
 
 					ImGui::TreePop();
 				}
@@ -138,7 +138,7 @@ void drawMainMenu() {
 					using namespace GhostWriting;
 
 					ImGui::Checkbox("label", &label);
-					ImGui::ColorEdit3("color", (float*) &color);
+					ImGui::ColorEdit3("color", (float*)&color);
 
 					ImGui::TreePop();
 				}
@@ -218,10 +218,20 @@ void drawMainMenu() {
 				ImGui::TreePop();
 			}
 
+			if (SLevelController::get()) {
+				if (ImGui::TreeNode("map")) {
+					if (SFuseBox::get()) {
+						if (ImGui::Button("Toggle Breaker")) {
+							SFuseBox::get()->Toggle();
+						}
+					}
+					ImGui::TreePop();
+				}
+			}
 			ImGui::TreePop();
 		}
 
-		if (false && ImGui::TreeNode("ghost")) {
+		if (ImGui::TreeNode("ghost")) {
 			if (SGhostAI::instance) {
 				if (ImGui::Button("appear"))
 					SGhostAI::instance->appear(2);
@@ -256,17 +266,17 @@ void drawMainMenu() {
 			for (SKey* key : SKey::notGrabbedKeys) {
 				const char* keyType = "none";
 				switch (key->getType()) {
-					case SKeyType::Main:
-						keyType = "main";
-						break;
+				case SKeyType::Main:
+					keyType = "main";
+					break;
 
-					case SKeyType::Car:
-						keyType = "car";
-						break;
+				case SKeyType::Car:
+					keyType = "car";
+					break;
 
-					case SKeyType::Cabin:
-						keyType = "cabin";
-						break;
+				case SKeyType::Cabin:
+					keyType = "cabin";
+					break;
 				}
 
 				if (ImGui::Button(std::string("grab ").append(keyType).c_str()))
@@ -282,12 +292,12 @@ void drawMainMenu() {
 			if (SOuijaBoard::instance && ImGui::TreeNode("ouija board")) {
 				using namespace OuijaBoard;
 
-				static char _customResponse[16] = "tusiphobia";
+				static char _customResponse[16] = "sussy";
 				ImGui::InputText("custom response", _customResponse, IM_ARRAYSIZE(_customResponse));
 
 				bool isNotHost = !SPhotonNetwork::isMasterClient();
 				ImGui::BeginDisabled(isNotHost);
-				if (ImGui::Button("send custom response"))
+				if (ImGui::Button("Send Custom Response"))
 					customResponse = _customResponse;
 
 				ImGui::EndDisabled();
@@ -332,8 +342,8 @@ const char* stringifyGhostType(SGhostType ghostType) {
 		ENUM_CASE_STRING(myling);
 		ENUM_CASE_STRING(onryo);
 
-		case theTwins:
-			return "the twins";
+	case theTwins:
+		return "the twins";
 
 		ENUM_CASE_STRING(raiju);
 		ENUM_CASE_STRING(obake);
@@ -353,16 +363,16 @@ const char* stringifyEvidenceType(SGhostEvidenceType evidenceType) {
 		ENUM_CASE_STRING(none);
 		ENUM_CASE_STRING(emf);
 
-		case spiritBox:
-			return "spirit box";
+	case spiritBox:
+		return "spirit box";
 
 		ENUM_CASE_STRING(fingerprints);
-		
-		case ghostOrb:
-			return "ghost orb";
-		
-		case ghostWriting:
-			return "ghost writing";
+
+	case ghostOrb:
+		return "ghost orb";
+
+	case ghostWriting:
+		return "ghost writing";
 
 		ENUM_CASE_STRING(freezing);
 		ENUM_CASE_STRING(dots);
@@ -476,7 +486,7 @@ void drawUtil() {
 							ImGui::Text("is hunting: %s", SGhostAI::instance->isHunting() ? "yes" : "no");
 
 						if (strength) {
-							ImGui::Text("strength: %d", (int) std::floor(graphPoints[0] / 48));
+							ImGui::Text("strength: %d", (int)std::floor(graphPoints[0] / 48));
 
 							ImGui::SameLine();
 							ImGui::TextDisabled("(?)");
@@ -515,7 +525,7 @@ void drawUtil() {
 						if (player)
 							sanities += player->getSanity()->getSanity();
 					}
-					
+
 					ImGui::Text("average sanity: %.2f%%", sanities / playerSpots.size());
 					for (SPlayerSpot* playerSpot : playerSpots) {
 						SPhotonPlayer* photonPlayer = playerSpot->getPhotonPlayer();
@@ -553,12 +563,23 @@ void drawUtil() {
 									ImGui::SetTooltip("%s already alive", isLocal ? "you are" : "this player is");
 								else if (SLiftButton::instance->isClosed())
 									ImGui::SetTooltip("the truck needs to be open to use this");
-
 							}
 
 							if (ImGui::Button("spawn body (takes some seconds)"))
 								app::PhotonView_RPC(player->fields._________, SString::of("SpawnDeadBodyNetworked"), app::RpcTarget__Enum::All, app::Array_Empty_15(*app::Array_Empty_15__MethodInfo), nullptr);
 
+							if (isLocal) {
+								if (ImGui::Button("Max Sanity")) {
+									SPlayerSanity* sanity = player->getSanity();
+									sanity->fields._________ = 0.00f;
+								}
+
+								ImGui::SameLine();
+								if (ImGui::Button("No Sanity")) {
+									SPlayerSanity* sanity = player->getSanity();
+									sanity->fields._________ = 100.00f;
+								}
+							}
 							ImGui::TreePop();
 						}
 					}

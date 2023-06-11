@@ -109,7 +109,7 @@ namespace Settings {
 			extern bool show;
 		}
 	}
-	
+
 	namespace Key {
 		namespace GrabAutomatically {
 			extern bool all;

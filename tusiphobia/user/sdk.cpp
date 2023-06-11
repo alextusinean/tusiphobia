@@ -121,7 +121,7 @@ SVector3::operator std::string() {
 }
 
 SVector3 SVector3::of(app::Vector3 vector) {
-	return *(SVector3*) &vector;
+	return *(SVector3*)&vector;
 }
 
 SVector3 SVector3::of(float x, float y, float z) {
@@ -150,7 +150,7 @@ bool SString::endsWith(SString* string) {
 }
 
 SString* SString::of(std::string string) {
-	return (SString*) app::Marshal_PtrToStringAnsi((void*) string.c_str(), nullptr);
+	return (SString*)app::Marshal_PtrToStringAnsi((void*)string.c_str(), nullptr);
 }
 
 #pragma endregion
@@ -160,7 +160,7 @@ SString* SString::of(std::string string) {
 SType* SType::get(std::string name) {
 	static std::map<std::string, SType*> typeMap = {};
 	if (!typeMap.contains(name))
-		typeMap[name] = (SType*) app::Type_GetType_3(SString::of(name), nullptr);
+		typeMap[name] = (SType*)app::Type_GetType_3(SString::of(name), nullptr);
 
 	return typeMap[name];
 }
@@ -170,11 +170,11 @@ SType* SType::get(std::string name) {
 #pragma region Component
 
 SGameObject* SComponent::getGameObject() {
-	return (SGameObject*) app::Component_get_gameObject(this, nullptr);
+	return (SGameObject*)app::Component_get_gameObject(this, nullptr);
 }
 
 STransform* SComponent::getTransform() {
-	return (STransform*) app::Component_get_transform(this, nullptr);
+	return (STransform*)app::Component_get_transform(this, nullptr);
 }
 
 #pragma endregion
@@ -186,35 +186,35 @@ bool SGameObject::isActive() {
 }
 
 SComponent* SGameObject::addComponent(SType* type) {
-	return (SComponent*) app::GameObject_AddComponent(this, type, nullptr);
+	return (SComponent*)app::GameObject_AddComponent(this, type, nullptr);
 }
 
 SComponent* SGameObject::getComponent(SType* type) {
-	return (SComponent*) app::GameObject_GetComponent(this, type, nullptr);
+	return (SComponent*)app::GameObject_GetComponent(this, type, nullptr);
 }
 
 SComponent* SGameObject::getComponentInChildren(SType* type, bool includeInactive) {
-	return (SComponent*) app::GameObject_GetComponentInChildren(this, type, includeInactive, nullptr);
+	return (SComponent*)app::GameObject_GetComponentInChildren(this, type, includeInactive, nullptr);
 }
 
 SComponent* SGameObject::getComponent(SString* typeName) {
-	return (SComponent*) app::GameObject_GetComponent_1(this, typeName, nullptr);
+	return (SComponent*)app::GameObject_GetComponent_1(this, typeName, nullptr);
 }
 
 STransform* SGameObject::getTransform() {
-	return (STransform*) app::GameObject_get_transform(this, nullptr);
+	return (STransform*)app::GameObject_get_transform(this, nullptr);
 }
 
 SGameObject* SGameObject::find(SString* name) {
-	return (SGameObject*) app::GameObject_Find(name, nullptr);
+	return (SGameObject*)app::GameObject_Find(name, nullptr);
 }
 
 SGameObject* SGameObject::findWithTag(SString* tag) {
-	return (SGameObject*) app::GameObject_FindGameObjectsWithTag(tag, nullptr)->vector[0];
+	return (SGameObject*)app::GameObject_FindGameObjectsWithTag(tag, nullptr)->vector[0];
 }
 
 SGameObject* SGameObject::of(SString* name) {
-	SGameObject* gameObject = (SGameObject*) il2cpp_object_new((Il2CppClass*) *app::GameObject__TypeInfo);
+	SGameObject* gameObject = (SGameObject*)il2cpp_object_new((Il2CppClass*)*app::GameObject__TypeInfo);
 	app::GameObject__ctor(gameObject, name, nullptr);
 
 	return gameObject;
@@ -249,11 +249,11 @@ void STransform::setPosition(SVector3 position) {
 }
 
 STransform* STransform::findChild(SString* childName) {
-	return (STransform*) app::Transform_Find(this, childName, nullptr);
+	return (STransform*)app::Transform_Find(this, childName, nullptr);
 }
 
 SQuaternion STransform::getRotation() {
-	return (SQuaternion) app::Transform_get_rotation(this, nullptr);
+	return (SQuaternion)app::Transform_get_rotation(this, nullptr);
 }
 
 void STransform::setRotation(SQuaternion rotation) {
@@ -261,7 +261,7 @@ void STransform::setRotation(SQuaternion rotation) {
 }
 
 STransform* STransform::getParent() {
-	return (STransform*) app::Transform_get_parent(this, nullptr);
+	return (STransform*)app::Transform_get_parent(this, nullptr);
 }
 
 void STransform::setParent(STransform* parent) {
@@ -271,9 +271,9 @@ void STransform::setParent(STransform* parent) {
 std::vector<STransform*> STransform::getChildren() {
 	std::vector<STransform*> result;
 
-	auto enumerator = (app::Transform_Enumerator*) app::Transform_GetEnumerator(this, nullptr);
+	auto enumerator = (app::Transform_Enumerator*)app::Transform_GetEnumerator(this, nullptr);
 	while (app::Transform_Enumerator_MoveNext(enumerator, nullptr))
-		result.push_back((STransform*) app::Transform_Enumerator_get_Current(enumerator, nullptr));
+		result.push_back((STransform*)app::Transform_Enumerator_get_Current(enumerator, nullptr));
 
 	return result;
 }
@@ -295,11 +295,11 @@ void SCollider::setEnabled(bool enabled) {
 #pragma region FirstPersonController
 
 SCharacterController* SFirstPersonController::getCharacterController() {
-	return (SCharacterController*) fields.m_CharacterController;
+	return (SCharacterController*)fields.m_CharacterController;
 }
 
 STransform* SFirstPersonController::getHeadTransform() {
-	return ((SComponent*) this)->getTransform()->findChild(SString::of("PCPlayerHead"));
+	return ((SComponent*)this)->getTransform()->findChild(SString::of("PCPlayerHead"));
 }
 
 float SFirstPersonController::getCurrentSpeed() {
@@ -388,7 +388,7 @@ const SColor SColor::cyan = SColor::of(0.0f, 1.0f, 1.0f);
 const SColor SColor::purple = SColor::of(1.0f, 0.0f, 1.0f);
 
 SColor SColor::of(app::Color color) {
-	return *(SColor*) &color;
+	return *(SColor*)&color;
 }
 
 SColor SColor::of(float r, float g, float b, float a) {
@@ -400,11 +400,11 @@ SColor SColor::of(float r, float g, float b, float a) {
 #pragma region Light
 
 SLightType SLight::getType() {
-	return (SLightType) app::Light_get_type(this, nullptr);
+	return (SLightType)app::Light_get_type(this, nullptr);
 }
 
 void SLight::setType(SLightType type) {
-	app::Light_set_type(this, (app::LightType__Enum) type, nullptr);
+	app::Light_set_type(this, (app::LightType__Enum)type, nullptr);
 }
 
 float SLight::getIntensity() {
@@ -456,11 +456,11 @@ void SLight::setShadowStrength(float shadowStrength) {
 }
 
 SLightShadows SLight::getShadows() {
-	return (SLightShadows) app::Light_get_shadows(this, nullptr);
+	return (SLightShadows)app::Light_get_shadows(this, nullptr);
 }
 
 void SLight::setShadows(SLightShadows shadows) {
-	return app::Light_set_shadows(this, (app::LightShadows__Enum) shadows, nullptr);
+	return app::Light_set_shadows(this, (app::LightShadows__Enum)shadows, nullptr);
 }
 
 #pragma endregion
@@ -468,11 +468,11 @@ void SLight::setShadows(SLightShadows shadows) {
 #pragma region PCFlashlight
 
 SLight* SPCFlashlight::getLight() {
-	return (SLight*) fields.__________1;
+	return (SLight*)fields.__________1;
 }
 
 SLight* SPCFlashlight::getHeadLight() {
-	return (SLight*) fields.headLight;
+	return (SLight*)fields.headLight;
 }
 
 #pragma endregion
@@ -484,7 +484,7 @@ int SUnityObject::getInstanceId() {
 }
 
 SString* SUnityObject::getName() {
-	return (SString*) app::Object_1_get_name(this, nullptr);
+	return (SString*)app::Object_1_get_name(this, nullptr);
 }
 
 #pragma endregion
@@ -492,15 +492,15 @@ SString* SUnityObject::getName() {
 #pragma region Torch
 
 SLight* STorch::getLight() {
-	return (SLight*) fields._________;
+	return (SLight*)fields._________;
 }
 
 bool STorch::isUV() {
-	return ((SUnityObject*) this)->getName()->toString() == "Blacklight Flashlight";
+	return ((SUnityObject*)this)->getName()->toString() == "Blacklight Flashlight";
 }
 
 bool STorch::isWeakFlashlight() {
-	return ((SUnityObject*) this)->getName()->toString() == "Flashlight";
+	return ((SUnityObject*)this)->getName()->toString() == "Flashlight";
 }
 
 #pragma endregion
@@ -508,7 +508,7 @@ bool STorch::isWeakFlashlight() {
 #pragma region PCPropGrab
 
 SLight* SPCPropGrab::getAreaLight() {
-	return (SLight*) ((SComponent*) ((SComponent*) this)->getTransform()->findChild(SString::of("PCAreaLight")))->getGameObject()->getComponent(SType::get("UnityEngine.Light"));
+	return (SLight*)((SComponent*)((SComponent*)this)->getTransform()->findChild(SString::of("PCAreaLight")))->getGameObject()->getComponent(SType::get("UnityEngine.Light"));
 }
 
 #pragma endregion
@@ -521,7 +521,7 @@ SKeyType SKey::getType() {
 	if (fields.info->fields.keyType == app::___Enum_6::Main)
 		return SKeyType::Main;
 
-	std::string objectName = ((SUnityObject*) this)->getName()->toString();
+	std::string objectName = ((SUnityObject*)this)->getName()->toString();
 	if (objectName == "CarKey")
 		return SKeyType::Car;
 
@@ -540,7 +540,7 @@ void SKey::grab() {
 #pragma region Shader
 
 SShader* SShader::find(SString* name) {
-	return (SShader*) app::Shader_Find(name, nullptr);
+	return (SShader*)app::Shader_Find(name, nullptr);
 }
 
 #pragma endregion
@@ -564,7 +564,7 @@ void SMaterial::setPass(int pass) {
 }
 
 SMaterial* SMaterial::of(SShader* shader) {
-	SMaterial* material = (SMaterial*) il2cpp_object_new((Il2CppClass*) *app::Material__TypeInfo);
+	SMaterial* material = (SMaterial*)il2cpp_object_new((Il2CppClass*)*app::Material__TypeInfo);
 	app::Material__ctor(material, shader, nullptr);
 
 	return material;
@@ -575,7 +575,7 @@ SMaterial* SMaterial::of(SShader* shader) {
 #pragma region Renderer
 
 SMaterial* SRenderer::getMaterial() {
-	return (SMaterial*) app::Renderer_get_material(this, nullptr);
+	return (SMaterial*)app::Renderer_get_material(this, nullptr);
 }
 
 #pragma endregion
@@ -629,7 +629,7 @@ void SArray::setValue(int index, SObject* value) {
 #pragma region Object_Array
 
 SObject_Array* SObject_Array::of() {
-	return (SObject_Array*) app::Array_Empty_15(*app::Array_Empty_15__MethodInfo);
+	return (SObject_Array*)app::Array_Empty_15(*app::Array_Empty_15__MethodInfo);
 }
 
 #pragma endregion
@@ -637,7 +637,7 @@ SObject_Array* SObject_Array::of() {
 #pragma region Int32
 
 SInt32* SInt32::of(int value) {
-	SInt32* result = (SInt32*) malloc(sizeof(SInt32));
+	SInt32* result = (SInt32*)malloc(sizeof(SInt32));
 	result->m_value = value;
 
 	return result;
@@ -656,7 +656,7 @@ void SInt32_Array::setValue(int index, int value) {
 }
 
 SInt32_Array* SInt32_Array::empty() {
-	return (SInt32_Array*) app::Array_Empty_10(*app::Array_Empty_10__MethodInfo);
+	return (SInt32_Array*)app::Array_Empty_10(*app::Array_Empty_10__MethodInfo);
 }
 
 #pragma endregion
@@ -692,34 +692,34 @@ void SColor_Array::setValue(int index, SColor value) {
 #pragma region Int32_List
 
 void SInt32_List::clear() {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_System_Int32___TypeInfo, "Clear", 0);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_System_Int32___TypeInfo, "Clear", 0);
 	app::List_1_System_Int32__Clear(this, methodInfo);
 }
 
 void SInt32_List::ensureCapacity(int capacity) {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_System_Int32___TypeInfo, "EnsureCapacity", 1);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_System_Int32___TypeInfo, "EnsureCapacity", 1);
 	app::List_1_System_Int32__EnsureCapacity(this, capacity, methodInfo);
 }
 
 void SInt32_List::add(int value) {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_System_Int32___TypeInfo, "Add", 1);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_System_Int32___TypeInfo, "Add", 1);
 	app::List_1_System_Int32__Add(this, value, methodInfo);
 }
 
 void SInt32_List::insert(int index, int value) {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_System_Int32___TypeInfo, "Insert", 2);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_System_Int32___TypeInfo, "Insert", 2);
 	app::List_1_System_Int32__Insert(this, index, value, methodInfo);
 }
 
 SInt32_Array* SInt32_List::toArray() {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_System_Int32___TypeInfo, "ToArray", 0);
-	return (SInt32_Array*) app::List_1_System_Int32__ToArray(this, methodInfo);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_System_Int32___TypeInfo, "ToArray", 0);
+	return (SInt32_Array*)app::List_1_System_Int32__ToArray(this, methodInfo);
 }
 
 SInt32_List* SInt32_List::of() {
-	SInt32_List* list = (SInt32_List*) il2cpp_object_new((Il2CppClass*) *app::List_1_System_Int32___TypeInfo);
+	SInt32_List* list = (SInt32_List*)il2cpp_object_new((Il2CppClass*)*app::List_1_System_Int32___TypeInfo);
 
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_System_Int32___TypeInfo, ".ctor", 0);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_System_Int32___TypeInfo, ".ctor", 0);
 	app::List_1_System_Int32___ctor(list, methodInfo);
 
 	return list;
@@ -738,7 +738,7 @@ int SVector3_List::getCount() {
 }
 
 void SVector3_List::ensureCapacity(int capacity) {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_UnityEngine_Vector3___TypeInfo, "EnsureCapacity", 1);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_UnityEngine_Vector3___TypeInfo, "EnsureCapacity", 1);
 	return app::List_1_UnityEngine_Vector3__EnsureCapacity(this, capacity, methodInfo);
 }
 
@@ -747,21 +747,21 @@ void SVector3_List::add(SVector3 value) {
 }
 
 void SVector3_List::insert(int index, SVector3 value) {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_UnityEngine_Vector3___TypeInfo, "Insert", 2);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_UnityEngine_Vector3___TypeInfo, "Insert", 2);
 	app::List_1_UnityEngine_Vector3__Insert(this, index, value, methodInfo);
 }
 
 SVector3 SVector3_List::get(int index) {
-	return (SVector3) app::List_1_UnityEngine_Vector3__get_Item(this, index, *app::List_1_UnityEngine_Vector3__get_Item__MethodInfo);
+	return (SVector3)app::List_1_UnityEngine_Vector3__get_Item(this, index, *app::List_1_UnityEngine_Vector3__get_Item__MethodInfo);
 }
 
 SVector3_Array* SVector3_List::toArray() {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_UnityEngine_Vector3___TypeInfo, "ToArray", 0);
-	return (SVector3_Array*) app::List_1_UnityEngine_Vector3__ToArray(this, methodInfo);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_UnityEngine_Vector3___TypeInfo, "ToArray", 0);
+	return (SVector3_Array*)app::List_1_UnityEngine_Vector3__ToArray(this, methodInfo);
 }
 
 SVector3_List* SVector3_List::of() {
-	SVector3_List* list = (SVector3_List*) il2cpp_object_new((Il2CppClass*) *app::List_1_UnityEngine_Vector3___TypeInfo);
+	SVector3_List* list = (SVector3_List*)il2cpp_object_new((Il2CppClass*)*app::List_1_UnityEngine_Vector3___TypeInfo);
 	app::List_1_UnityEngine_Vector3___ctor(list, *app::List_1_UnityEngine_Vector3___ctor__MethodInfo);
 
 	return list;
@@ -772,34 +772,34 @@ SVector3_List* SVector3_List::of() {
 #pragma region Color_List
 
 void SColor_List::clear() {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_UnityEngine_Color___TypeInfo, "Clear", 0);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_UnityEngine_Color___TypeInfo, "Clear", 0);
 	app::List_1_UnityEngine_Color__Clear(this, methodInfo);
 }
 
 void SColor_List::ensureCapacity(int capacity) {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_UnityEngine_Color___TypeInfo, "EnsureCapacity", 1);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_UnityEngine_Color___TypeInfo, "EnsureCapacity", 1);
 	return app::List_1_UnityEngine_Color__EnsureCapacity(this, capacity, methodInfo);
 }
 
 void SColor_List::add(SColor value) {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_UnityEngine_Color___TypeInfo, "Add", 1);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_UnityEngine_Color___TypeInfo, "Add", 1);
 	app::List_1_UnityEngine_Color__Add(this, value, methodInfo);
 }
 
 void SColor_List::insert(int index, SColor value) {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_UnityEngine_Color___TypeInfo, "Insert", 2);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_UnityEngine_Color___TypeInfo, "Insert", 2);
 	app::List_1_UnityEngine_Color__Insert(this, index, value, methodInfo);
 }
 
 SColor_Array* SColor_List::toArray() {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_UnityEngine_Color___TypeInfo, "ToArray", 0);
-	return (SColor_Array*) app::List_1_UnityEngine_Color__ToArray(this, methodInfo);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_UnityEngine_Color___TypeInfo, "ToArray", 0);
+	return (SColor_Array*)app::List_1_UnityEngine_Color__ToArray(this, methodInfo);
 }
 
 SColor_List* SColor_List::of() {
-	SColor_List* list = (SColor_List*) il2cpp_object_new((Il2CppClass*) *app::List_1_UnityEngine_Color___TypeInfo);
+	SColor_List* list = (SColor_List*)il2cpp_object_new((Il2CppClass*)*app::List_1_UnityEngine_Color___TypeInfo);
 
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::List_1_UnityEngine_Color___TypeInfo, ".ctor", 0);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::List_1_UnityEngine_Color___TypeInfo, ".ctor", 0);
 	app::List_1_UnityEngine_Color___ctor(list, methodInfo);
 
 	return list;
@@ -818,7 +818,7 @@ void SMesh::clear() {
 }
 
 SVector3_Array* SMesh::getVertices() {
-	return (SVector3_Array*) app::Mesh_get_vertices(this, nullptr);
+	return (SVector3_Array*)app::Mesh_get_vertices(this, nullptr);
 }
 
 void SMesh::setVertices(SVector3_Array* vertices) {
@@ -830,11 +830,11 @@ void SMesh::setVertices(SVector3_List* vertices) {
 }
 
 SColor_Array* SMesh::getColors() {
-	return (SColor_Array*) app::Mesh_get_colors(this, nullptr);
+	return (SColor_Array*)app::Mesh_get_colors(this, nullptr);
 }
 
 void SMesh::setColors(SColor_Array* colors) {
-	static MethodInfo* methodInfo = (MethodInfo*) il2cpp_class_get_method_from_name((Il2CppClass*) *app::Mesh__TypeInfo, "set_colors", 1);
+	static MethodInfo* methodInfo = (MethodInfo*)il2cpp_class_get_method_from_name((Il2CppClass*)*app::Mesh__TypeInfo, "set_colors", 1);
 	app::Mesh_set_colors(this, colors, nullptr);
 }
 
@@ -843,15 +843,15 @@ void SMesh::setColors(SColor_List* colors) {
 }
 
 SInt32_Array* SMesh::getIndices(int subMeshIndex) {
-	return (SInt32_Array*) app::Mesh_GetIndices(this, subMeshIndex, nullptr);
+	return (SInt32_Array*)app::Mesh_GetIndices(this, subMeshIndex, nullptr);
 }
 
 void SMesh::setIndices(SInt32_Array* indices, SMeshTopology meshTopology, int subMeshIndex) {
-	app::Mesh_SetIndices(this, indices, (app::MeshTopology__Enum) meshTopology, subMeshIndex, nullptr);
+	app::Mesh_SetIndices(this, indices, (app::MeshTopology__Enum)meshTopology, subMeshIndex, nullptr);
 }
 
 SMesh* SMesh::of() {
-	SMesh* mesh = (SMesh*) il2cpp_object_new((Il2CppClass*) *app::Mesh__TypeInfo);
+	SMesh* mesh = (SMesh*)il2cpp_object_new((Il2CppClass*)*app::Mesh__TypeInfo);
 	app::Mesh__ctor(mesh, nullptr);
 
 	return mesh;
@@ -862,7 +862,7 @@ SMesh* SMesh::of() {
 #pragma region Matrix4x4
 
 SMatrix4x4 SMatrix4x4::trs(SVector3 position, SQuaternion rotation, SVector3 scale) {
-	return (SMatrix4x4) app::Matrix4x4_TRS(position, rotation, scale, nullptr);
+	return (SMatrix4x4)app::Matrix4x4_TRS(position, rotation, scale, nullptr);
 }
 
 #pragma endregion
@@ -902,7 +902,7 @@ void SCamera::setFarClipPlane(float farClipPlane) {
 }
 
 void SCamera::setClearFlags(SCameraClearFlags clearFlags) {
-	app::Camera_set_clearFlags(this, (app::CameraClearFlags__Enum) clearFlags, nullptr);
+	app::Camera_set_clearFlags(this, (app::CameraClearFlags__Enum)clearFlags, nullptr);
 }
 
 void SCamera::setUseOcclusionCulling(bool useOcclusionCulling) {
@@ -910,15 +910,15 @@ void SCamera::setUseOcclusionCulling(bool useOcclusionCulling) {
 }
 
 SVector3 SCamera::worldToScreenPoint(SVector3 position) {
-	return (SVector3) app::Camera_WorldToScreenPoint_1(this, position, nullptr);
+	return (SVector3)app::Camera_WorldToScreenPoint_1(this, position, nullptr);
 }
 
 SCamera* SCamera::getMain() {
-	return (SCamera*) app::Camera_get_main(nullptr);
+	return (SCamera*)app::Camera_get_main(nullptr);
 }
 
 SCamera* SCamera::getCurrent() {
-	return (SCamera*) app::Camera_get_current(nullptr);
+	return (SCamera*)app::Camera_get_current(nullptr);
 }
 
 #pragma endregion
@@ -942,7 +942,7 @@ void SGraphics::drawMeshNow(SMesh* mesh, SMatrix4x4 matrix) {
 #pragma region Animator
 
 STransform* SAnimator::getBoneTransform(SHumanBodyBones bone) {
-	return (STransform*) app::Animator_GetBoneTransform(this, (app::HumanBodyBones__Enum) bone, *app::Animator_GetBoneTransform__MethodInfo);
+	return (STransform*)app::Animator_GetBoneTransform(this, (app::HumanBodyBones__Enum)bone, *app::Animator_GetBoneTransform__MethodInfo);
 }
 
 #pragma endregion
@@ -950,11 +950,11 @@ STransform* SAnimator::getBoneTransform(SHumanBodyBones bone) {
 #pragma region GhostTraits
 
 SGhostType SGhostTraits::getType() {
-	return (SGhostType) _________;
+	return (SGhostType)_________;
 }
 
 SGhostType SGhostTraits::getMimicType() {
-	return (SGhostType) __________1;
+	return (SGhostType)__________1;
 }
 
 SGhostEvidenceType* SGhostTraits::getEvidences(int* count) {
@@ -964,7 +964,7 @@ SGhostEvidenceType* SGhostTraits::getEvidences(int* count) {
 	if (count)
 		*count = __________2->fields._size;
 
-	return (SGhostEvidenceType*) __________2->fields._items->vector;
+	return (SGhostEvidenceType*)__________2->fields._items->vector;
 }
 
 SGhostEvidenceType* SGhostTraits::getOtherEvidences(int* count) {
@@ -974,7 +974,7 @@ SGhostEvidenceType* SGhostTraits::getOtherEvidences(int* count) {
 	if (count)
 		*count = __________3->fields._size;
 
-	return (SGhostEvidenceType*) __________3->fields._items->vector;
+	return (SGhostEvidenceType*)__________3->fields._items->vector;
 }
 
 int SGhostTraits::getAge() {
@@ -986,7 +986,7 @@ bool SGhostTraits::isMale() {
 }
 
 SString* SGhostTraits::getName() {
-	return (SString*) __________6;
+	return (SString*)__________6;
 }
 
 int SGhostTraits::get7() {
@@ -1018,7 +1018,7 @@ bool SGhostTraits::get12() {
 #pragma region LevelRoom
 
 SString* SLevelRoom::getName() {
-	return (SString*) fields.__________7;
+	return (SString*)fields.__________7;
 }
 
 #pragma endregion
@@ -1026,11 +1026,11 @@ SString* SLevelRoom::getName() {
 #pragma region GhostInfo
 
 SGhostTraits SGhostInfo::getGhostTraits() {
-	return (SGhostTraits) fields._________;
+	return (SGhostTraits)fields._________;
 }
 
 SLevelRoom* SGhostInfo::getFavouriteRoom() {
-	return (SLevelRoom*) fields.__________1;
+	return (SLevelRoom*)fields.__________1;
 }
 
 #pragma endregion
@@ -1052,7 +1052,7 @@ bool SGhostAI::isHunting() {
 }
 
 SGhostInfo* SGhostAI::getGhostInfo() {
-	return (SGhostInfo*) fields.__________3;
+	return (SGhostInfo*)fields.__________3;
 }
 
 SAnimator* SGhostAI::getAnimator() {
@@ -1060,7 +1060,7 @@ SAnimator* SGhostAI::getAnimator() {
 	if (!ghostModel)
 		return nullptr;
 
-	return (SAnimator*) ghostModel->fields.__________3;
+	return (SAnimator*)ghostModel->fields.__________3;
 }
 
 bool SGhostAI::lookAtNearestPlayer() {
@@ -1080,13 +1080,22 @@ void SGhostAI::disappear() {
 #pragma region LevelController
 
 SGhostAI* SLevelController::getGhostAI() {
-	return (SGhostAI*) fields.__________3;
+	return (SGhostAI*)fields.__________3;
 }
 
 SLevelController* SLevelController::get() {
-	return (SLevelController*) (*app::LevelController__TypeInfo)->static_fields->_________;
+	return (SLevelController*)(*app::LevelController__TypeInfo)->static_fields->_________;
 }
 
+#pragma endregion
+
+#pragma region FuseBox
+SFuseBox* SFuseBox::get() {
+	return (SFuseBox*)(SLevelController::get()->fields.__________11);
+}
+void SFuseBox::Toggle() {
+	app::FuseBox_Use(this, nullptr);
+}
 #pragma endregion
 
 #pragma region PlayerSanity
@@ -1112,15 +1121,15 @@ bool SPlayer::isLocal() {
 }
 
 SFirstPersonController* SPlayer::getFirstPersonController() {
-	return (SFirstPersonController*) fields.__________35;
+	return (SFirstPersonController*)fields.__________35;
 }
 
 SPlayerSanity* SPlayer::getSanity() {
-	return (SPlayerSanity*) fields.__________22;
+	return (SPlayerSanity*)fields.__________22;
 }
 
 SAnimator* SPlayer::getAnimator() {
-	return (SAnimator*) fields.__________43;
+	return (SAnimator*)fields.__________43;
 }
 
 void SPlayer::startKilling() {
@@ -1144,11 +1153,11 @@ bool SPhotonPlayer::isLocal() {
 }
 
 SString* SPhotonPlayer::getUserId() {
-	return (SString*) app::Player_get_UserId(this, nullptr);
+	return (SString*)app::Player_get_UserId(this, nullptr);
 }
 
 SString* SPhotonPlayer::getNickName() {
-	return (SString*) fields.nickName;
+	return (SString*)fields.nickName;
 }
 
 #pragma endregion
@@ -1156,11 +1165,11 @@ SString* SPhotonPlayer::getNickName() {
 #pragma region PlayerSpot
 
 SPhotonPlayer* SPlayerSpot::getPhotonPlayer() {
-	return (SPhotonPlayer*) fields.photonPlayer;
+	return (SPhotonPlayer*)fields.photonPlayer;
 }
 
 SPlayer* SPlayerSpot::getPlayer() {
-	return (SPlayer*) fields.player;
+	return (SPlayer*)fields.player;
 }
 
 #pragma endregion
@@ -1170,7 +1179,7 @@ SPlayer* SPlayerSpot::getPlayer() {
 std::vector<SPlayerSpot*> SNetwork::getPlayerSpots() {
 	std::vector<SPlayerSpot*> playerSpots;
 	for (int i = 0; i < fields.__________1->fields._size; i++) {
-		playerSpots.push_back((SPlayerSpot*) fields.__________1->fields._items->vector[i]);
+		playerSpots.push_back((SPlayerSpot*)fields.__________1->fields._items->vector[i]);
 	}
 
 	return playerSpots;
@@ -1179,12 +1188,12 @@ std::vector<SPlayerSpot*> SNetwork::getPlayerSpots() {
 SNetwork* SNetwork::get() {
 	static app::Network__Class* networkClass;
 	if (!networkClass) {
-		networkClass = (app::Network__Class*) getClass("", "Network");
+		networkClass = (app::Network__Class*)getClass("", "Network");
 		if (!networkClass)
 			return nullptr;
 	}
 
-	return (SNetwork*) networkClass->static_fields->_________;
+	return (SNetwork*)networkClass->static_fields->_________;
 }
 
 #pragma endregion
@@ -1196,7 +1205,7 @@ void SGUIStyleState::setTextColor(SColor color) {
 }
 
 SGUIStyleState* SGUIStyleState::of() {
-	SGUIStyleState* guiStyleState = (SGUIStyleState*) il2cpp_object_new((Il2CppClass*) *app::GUIStyleState__TypeInfo);
+	SGUIStyleState* guiStyleState = (SGUIStyleState*)il2cpp_object_new((Il2CppClass*)*app::GUIStyleState__TypeInfo);
 	app::GUIStyleState__ctor(guiStyleState, nullptr);
 
 	return guiStyleState;
@@ -1207,7 +1216,7 @@ SGUIStyleState* SGUIStyleState::of() {
 #pragma region GUIStyle
 
 SGUIStyleState* SGUIStyle::getNormal() {
-	return (SGUIStyleState*) fields.m_Normal;
+	return (SGUIStyleState*)fields.m_Normal;
 }
 
 void SGUIStyle::setNormal(SGUIStyleState* state) {
@@ -1215,11 +1224,11 @@ void SGUIStyle::setNormal(SGUIStyleState* state) {
 }
 
 void SGUIStyle::setAlignment(STextAnchor alignment) {
-	app::GUIStyle_set_alignment(this, (app::TextAnchor__Enum) alignment, nullptr);
+	app::GUIStyle_set_alignment(this, (app::TextAnchor__Enum)alignment, nullptr);
 }
 
 SGUIStyle* SGUIStyle::of() {
-	SGUIStyle* guiStyle = (SGUIStyle*) il2cpp_object_new((Il2CppClass*) *app::GUIStyle__TypeInfo);
+	SGUIStyle* guiStyle = (SGUIStyle*)il2cpp_object_new((Il2CppClass*)*app::GUIStyle__TypeInfo);
 	app::GUIStyle__ctor(guiStyle, nullptr);
 
 	return guiStyle;
@@ -1274,7 +1283,7 @@ void SOuijaBoard::sendResponse(SString* response) {
 #pragma region PhotoValues
 
 SEvidenceType SPhotoValues::getEvidenceType() {
-	return (SEvidenceType) fields.evidenceType;
+	return (SEvidenceType)fields.evidenceType;
 }
 
 #pragma endregion
@@ -1282,7 +1291,7 @@ SEvidenceType SPhotoValues::getEvidenceType() {
 #pragma region Evidence
 
 SPhotoValues* SEvidence::getPhotoValues() {
-	return (SPhotoValues*) fields._________;
+	return (SPhotoValues*)fields._________;
 }
 
 SEvidenceType SEvidence::getType() {
@@ -1320,20 +1329,20 @@ SColor SEMF::getColor() {
 
 SColor SEMF::getColor(int level) {
 	switch (level) {
-		case 0:
-			return color1;
+	case 0:
+		return color1;
 
-		case 1:
-			return color2;
+	case 1:
+		return color2;
 
-		case 2:
-			return color3;
+	case 2:
+		return color3;
 
-		case 3:
-			return color4;
+	case 3:
+		return color4;
 
-		case 4:
-			return color5;
+	case 4:
+		return color5;
 	}
 
 	return SColor::dummy;

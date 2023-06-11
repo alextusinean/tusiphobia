@@ -7,8 +7,8 @@ extern "C" FARPROC OriginalFuncs_winhttp[65];
 extern "C" FARPROC OriginalFuncs_winmm[181];
 
 namespace Exports {
-	inline constexpr std::array<const char*, 5> compatibleModules = { "dwmapi.dll", "psapi.dll", "version.dll", "winhttp.dll", "winmm.dll"};
-	
+	inline constexpr std::array<const char*, 5> compatibleModules = { "dwmapi.dll", "psapi.dll", "version.dll", "winhttp.dll", "winmm.dll" };
+
 	constexpr std::array<const char*, 181> winmmExportNames = {
 		"CloseDriver",
 		"DefDriverProc",

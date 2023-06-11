@@ -173,7 +173,6 @@ struct SGameObject;
 struct STransform;
 
 struct SObject : app::Object {
-
 };
 
 struct SBehaviour : app::Behaviour {
@@ -289,7 +288,6 @@ struct SCollider : app::Collider {
 };
 
 struct SCharacterController : app::CharacterController {
-
 };
 
 struct SFirstPersonController : app::FirstPersonController {
@@ -371,7 +369,7 @@ struct SLight : app::Light {
 	float getSpotAngle();
 
 	void setSpotAngle(float spotAngle);
-	
+
 	float getRange();
 
 	void setRange(float range);
@@ -455,7 +453,7 @@ struct SLineRenderer : app::LineRenderer {
 	void setEndColor(SColor endColor);
 
 	void setColor(SColor color);
-	
+
 	void setPosition(int index, SVector3 position);
 };
 
@@ -669,6 +667,11 @@ struct SLevelController : app::LevelController {
 	SGhostAI* getGhostAI();
 
 	static SLevelController* get();
+};
+
+struct SFuseBox : app::FuseBox {
+	static SFuseBox* get();
+	void Toggle();
 };
 
 struct SPlayerSanity : app::PlayerSanity {
