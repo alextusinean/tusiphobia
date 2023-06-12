@@ -1075,6 +1075,9 @@ void SGhostAI::disappear() {
 	app::GhostAI_UnAppear(this, nullptr);
 }
 
+void SGhostAI::stopHunt() {
+	app::GhostAI_StopGhostFromHunting(this, nullptr);
+}
 #pragma endregion
 
 #pragma region LevelController
@@ -1086,6 +1089,10 @@ SGhostAI* SLevelController::getGhostAI() {
 SLevelController* SLevelController::get() {
 	return (SLevelController*)(*app::LevelController__TypeInfo)->static_fields->_________;
 }
+
+#pragma endregion
+
+#pragma region RandomSpawn
 
 #pragma endregion
 
@@ -1133,7 +1140,12 @@ SAnimator* SPlayer::getAnimator() {
 }
 
 void SPlayer::startKilling() {
-	app::Player_1_StartKillingPlayer(this, nullptr);
+	SPhotonMessageInfo info;
+	SNetwork* net = SNetwork::get();
+	info.photonView = this->fields._________;
+	info.timeInt = 0;
+	info.Sender = (app::Player*)this;
+	app::Player_1_StartKillingPlayerNetworked(this, true, info, nullptr);
 }
 
 void SPlayer::kill() {
@@ -1141,7 +1153,12 @@ void SPlayer::kill() {
 }
 
 void SPlayer::revive() {
-	app::Player_1_RevivePlayer(this, nullptr);
+	SPhotonMessageInfo info;
+	SNetwork* net = SNetwork::get();
+	info.photonView = this->fields._________;
+	info.timeInt = 0;
+	info.Sender = (app::Player*)this;
+	app::Player_1_Revive(this, info, nullptr);
 }
 
 #pragma endregion
@@ -1162,6 +1179,9 @@ SString* SPhotonPlayer::getNickName() {
 
 #pragma endregion
 
+#pragma region PhotonView
+
+#pragma endregion
 #pragma region PlayerSpot
 
 SPhotonPlayer* SPlayerSpot::getPhotonPlayer() {
@@ -1195,7 +1215,6 @@ SNetwork* SNetwork::get() {
 
 	return (SNetwork*)networkClass->static_fields->_________;
 }
-
 #pragma endregion
 
 #pragma region GUIStyleState

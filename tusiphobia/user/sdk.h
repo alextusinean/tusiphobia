@@ -661,6 +661,7 @@ struct SGhostAI : app::GhostAI {
 	void appear(int unk);
 
 	void disappear();
+	void stopHunt();
 };
 
 struct SLevelController : app::LevelController {
@@ -672,6 +673,11 @@ struct SLevelController : app::LevelController {
 struct SFuseBox : app::FuseBox {
 	static SFuseBox* get();
 	void Toggle();
+};
+
+struct SPhotonView : app::PhotonView {
+};
+struct SPhotonMessageInfo : app::PhotonMessageInfo {
 };
 
 struct SPlayerSanity : app::PlayerSanity {

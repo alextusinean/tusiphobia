@@ -207,6 +207,22 @@ void drawMainMenu() {
 					ImGui::TreePop();
 				}
 
+				if (ImGui::TreeNode("behavior")) {
+					if (SGhostAI::instance) {
+						if (ImGui::Button("Stop Hunt")) {
+							SGhostAI::instance->stopHunt();
+						}
+						if (ImGui::Button("Appear"))
+							SGhostAI::instance->appear(2);
+
+						if (ImGui::Button("Look at nearest player"))
+							SGhostAI::instance->lookAtNearestPlayer();
+
+						if (ImGui::Button("Disappear"))
+							SGhostAI::instance->disappear();
+					}
+					ImGui::TreePop();
+				}
 				ImGui::TreePop();
 			}
 
@@ -228,21 +244,6 @@ void drawMainMenu() {
 					ImGui::TreePop();
 				}
 			}
-			ImGui::TreePop();
-		}
-
-		if (ImGui::TreeNode("ghost")) {
-			if (SGhostAI::instance) {
-				if (ImGui::Button("appear"))
-					SGhostAI::instance->appear(2);
-
-				if (ImGui::Button("look at nearest player"))
-					SGhostAI::instance->lookAtNearestPlayer();
-
-				if (ImGui::Button("disappear"))
-					SGhostAI::instance->disappear();
-			}
-
 			ImGui::TreePop();
 		}
 
