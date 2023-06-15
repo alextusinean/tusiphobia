@@ -1140,12 +1140,7 @@ SAnimator* SPlayer::getAnimator() {
 }
 
 void SPlayer::startKilling() {
-	SPhotonMessageInfo info;
-	SNetwork* net = SNetwork::get();
-	info.photonView = this->fields._________;
-	info.timeInt = 0;
-	info.Sender = (app::Player*)this;
-	app::Player_1_StartKillingPlayerNetworked(this, true, info, nullptr);
+	app::Player_1_StartKillingPlayer(this, nullptr);
 }
 
 void SPlayer::kill() {
@@ -1153,12 +1148,7 @@ void SPlayer::kill() {
 }
 
 void SPlayer::revive() {
-	SPhotonMessageInfo info;
-	SNetwork* net = SNetwork::get();
-	info.photonView = this->fields._________;
-	info.timeInt = 0;
-	info.Sender = (app::Player*)this;
-	app::Player_1_Revive(this, info, nullptr);
+	app::Player_1_RevivePlayer(this, nullptr);
 }
 
 #pragma endregion
