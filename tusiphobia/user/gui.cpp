@@ -276,22 +276,22 @@ void drawMainMenu() {
 			ImGui::TreePop();
 		}
 
-		if (ImGui::TreeNode("cursed posession")) {
-			using namespace CursedPosession;
+		// if (ImGui::TreeNode("cursed posession")) {
+		// 	using namespace CursedPosession;
 
-			if (SOuijaBoard::instance && ImGui::TreeNode("ouija board (host only)")) {
-				using namespace OuijaBoard;
+		// 	if (SOuijaBoard::instance && ImGui::TreeNode("ouija board (host only)")) {
+		// 		using namespace OuijaBoard;
 
-				static char _customResponse[16] = "tusiphobia";
-				ImGui::InputText("custom response", _customResponse, IM_ARRAYSIZE(_customResponse));
-				if (ImGui::Button("send custom response"))
-					customResponse = _customResponse;
+		// 		static char _customResponse[16] = "tusiphobia";
+		// 		ImGui::InputText("custom response", _customResponse, IM_ARRAYSIZE(_customResponse));
+		// 		if (ImGui::Button("send custom response"))
+		// 			customResponse = _customResponse;
 
-				ImGui::TreePop();
-			}
+		// 		ImGui::TreePop();
+		// 	}
 
-			ImGui::TreePop();
-		}
+		// 	ImGui::TreePop();
+		// }
 	}
 
 	ImGui::End();
