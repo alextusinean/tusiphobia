@@ -495,9 +495,9 @@ HRESULT Present_Hook(IDXGISwapChain* __this, UINT sync, UINT flags) {
 
 	bool watermarkWindowOpen = true;
 	if (ImGui::Begin("watermark", &watermarkWindowOpen, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoFocusOnAppearing)) {
-		ImGui::Text("e-mail: brandenstober@outlook.com");
-		ImGui::Text("https://brandenstober.com/");
-		ImGui::Text("https://github.com/BrandenStoberReal/tusiphobia");
+		ImGui::Text("e-mail: alex@tusinean.ro");
+		ImGui::Text("https://alex.tusinean.ro");
+		ImGui::Text("https://github.com/alextusinean/tusiphobia");
 	}
 
 	ImGui::End();
